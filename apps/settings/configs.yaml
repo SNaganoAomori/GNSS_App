@@ -1,0 +1,304 @@
+point_datetime_col: end
+point_number_col: pt_num
+point_name_col: pt_name
+point_datetime_col_jn: 測定終了日時
+point_number_col_jn: 測点番号
+point_name_col_jn: 測点名
+point_pdop_col_jn: PDOP
+point_epochs_col_jn: 測定回数
+point_nsats_col_jn: 衛星数
+point_signal_frec_col_jn: 信号の周波数
+point_lon_col_jn: 経度
+point_lat_col_jn: 緯度
+
+on_drogger:
+  # DroggerGPSアプリから出力される、".gpx"ファイルのオリジナルタグ名と
+  # 変更する名称
+  # FIX: https://drogger.hatenadiary.jp/entry/2023/06/02/095559
+  original_cols: 
+       ele: altitude # 標高 (float)
+       time: datetime # 日時 (str)
+       geoidheight: geoid_height # ジオイド高 (float) 
+       name: pt_name # 測点名 (str)
+       fix: fix # FIX解 (str[3D, DGPS: (SBAS|SLAS), FIXED]) 
+       sat: satellites # 衛星数 (float)
+       hdop: hdop # 水平精度低下率 (float)
+       vdop: vdop # 垂直精度低下率 (float)
+       pdop: pdop # 位置精度低下率 (float)
+       pointNumber: pt_num # 測点番号 (float)
+       coordGenaration: coord_genaration # 地殻変動補正 (str)
+       type: projective_technique_epsg # 地殻変動補正後の日本測地系の平面直角座標系のEPSGコード
+       x: transformed_x(lat) # 地殻変動補正後のX座標
+       y: transformed_y(lon) # 地殻変動補正後のY座標
+       geoidSystem: geoid_system # ジオイドシステム(str)
+       starttime: start # 測定開始日次 (str)
+       endtime: end # 測定終了日次 (str)
+       epochs: epochs # 測定回数 (float)
+       epochInterval: interval # 測定間隔 (float)
+       satMinEle: min_angle_elev_mask # 最低衛星仰角マスク値 (float)
+       stddevDistanceMeter: std_h # 水平の標準偏差 (float)
+       stddevHeightMeter: std_v # 垂直の標準偏差 (float)
+       lastHacc: last_std_h # 最後に測定した際の水平の標準偏差 (float)
+       lastVacc: last_std_v # 最後に測定した際の垂直の標準偏差 (float)
+       fixMode: fix_mode # FIX解 (str)
+       enableTiltCorrection: enable_tilt_correction # チルト補正 (str)
+       tiltAntHeight: tilt_antena_height # アンテナチルト高 (float)
+       antennaHeightNote: antena_height # 設定アンテナ高 (float)
+       group: group # グループ (float)
+       index: index # index (float)
+       signals: satellite_signals # 衛星信号の種類 (str)
+       receiverName: receiver # 測定に使用したGNSS機器の名称 (str)
+       lat: latitude # 補正前緯度 (float)
+       lon: longitude # 補正前経度 (float)
+       ellipsoidHeight: ellipsoid_height # 楕円体高 (float)
+
+  # 使用する列名(名称変更後の)と変更する日本語名
+  use_cols: 
+    start: 測定開始日時
+    end: 測定終了日時
+    pt_num: 測点番号
+    pt_name: 測点名
+    longitude: 経度
+    latitude: 緯度
+    altitude: 標高
+    fix_mode: Fix解
+    epochs: 測定回数
+    interval: 測定間隔
+    pdop: PDOP
+    satellites: 衛星数
+    std_h: 水平標準偏差
+    std_v: 垂直標準偏差
+    satellite_signals: 衛星信号
+    signal_frecuencies: 信号の周波数
+    receiver: 測定機器
+    projective_technique_epsg: 平面直角座標系（EPSG）
+    transformed_y(lon): Y(lon)
+    transformed_x(lat): X(lat)
+
+  generation_tags:
+    coord_genaration: coord_genaration
+    projective_technique: projective_technique_epsg
+    x: transformed_x
+    y: transformed_y
+
+  re_projective_name:
+    # 投影変換後の文字列と対応するEPSGコード
+    JGD2011_R: #日本測地系2011 平面直角座標系
+      JPN1: 6669
+      JPN2: 6670
+      JPN3: 6671
+      JPN4: 6672
+      JPN5: 6673
+      JPN6: 6674
+      JPN7: 6675
+      JPN8: 6676
+      JPN9: 6677
+      JPN10: 6678
+      JPN11: 6679
+      JPN12: 6680
+      JPN13: 6681
+      JPN14: 6682
+      JPN15: 6683
+      JPN16: 6684
+      JPN17: 6685
+      JPN18: 6686
+      JPN19: 6687
+      UTM51: 6688
+      UTM52: 6689
+      UTM53: 6690
+      UTM54: 6691
+      UTM55: 6692
+
+  signals:
+    L1: L1
+    L2: L2
+    L5: L5
+  
+  signals_name_col: satellite_signals
+  signal_frec_col: signal_frecuencies
+  datetime_fmt: '%Y-%m-%dT%H:%M:%S.%f'
+  start_col: start
+  end_col: end
+
+
+# -------------------------------------------------------------------------------#
+
+
+chiriin_param_files:
+  # 地理院の測量計算サイト（https://vldb.gsi.go.jp/sokuchi/surveycalc/api_help.html）
+  # で使用するAPIの設定ファイル。
+  semidayna:
+    base_url: http://vldb.gsi.go.jp/sokuchi/surveycalc/semidyna/web/semidyna_r.php?
+    output_type: 
+      outputType: json
+    param_file_base: 
+      chiiki: SemiDyna{YEAR}.par
+    ganki2konki:
+      sokuchi: 1 #0=元期から今期へ、1=今期から元期へ
+    projective:
+      Place: 0 #0=経緯度、1=平面直角座標系
+    hosei:
+      Hosei_J: 3 #2=2次元補正、3=3次元補正
+    lon:
+      longitude: -9999
+    lat:
+      latitude: -9999
+    alti:
+      altitude1: -9999
+
+
+# -------------------------------------------------------------------------------#
+
+
+web_app:
+  # Webアプリで使用する設定
+  help_input_file: .gpxのファイルをドラッグ＆ドロップで入れて下さい。複数でも構いません。
+  help_semi_dyna: セミダイナミック補正（地殻変動補正）をスマホアプリで行わなかった場合はチェックを入れて下さい。※インターネットに接続されていない場合は補正が行われません。補正が行われていないと測量野帳の出力は出来ません。
+  help_epsg: 正しく面積や距離を計算する為には、"経緯度" ではなく "平面直角座標系" に変換する必要があります。平面直角座標系は局所的な座標系なので、地域によって座標系の名称が異なります。
+  help_accuracy_thres: 2023年時点での「収穫調査規定運用-第2章-運用6」から、閾値を利用して基準に満たないデータを強調します。
+  add_prepros:
+    - file_idx
+    - file_name
+    - group_name
+    - sort_col
+    - sort_type
+  add_details: 
+    office: 森林管理署
+    branch_office: 森林事務所
+    local_area: 国有林名
+    address: 林小班
+    year: 事業年度
+    project_name: 事業名
+    person: 測量者名
+    points: 測点数
+    max_pdop: PDOPの最大値
+    min_nsats: 衛星数の最小値
+    min_signal_frec: 信号周波数の最小値
+    area(ha): 面積(ha)
+    length(m): 周囲長(m)
+  show_columns_in_table:
+    - 測定終了日時
+    - 測点番号
+    - 測点名
+    - 測定回数
+    - PDOP
+    - 衛星数
+    - 信号の周波数
+    - ori_idx
+  threshold_columns_in_table:
+    - 測定回数
+    - PDOP
+    - 衛星数
+    - 信号の周波数
+    
+
+  
+
+excel_templates:
+  # ファイルパス
+  file_path: apps/settings/excel_template.xlsx
+
+  # 提出する成果物のExcelファイルに書き込む場合の設定
+  main_sheet:
+    sheet_name: 観測手簿
+
+    # 測定結果の概要
+    summary_cells:
+      office:
+        row: 3
+        column: 4
+      branch_office: 
+        row: 4
+        column: 4
+      local_area: 
+        row: 5
+        column: 4
+      address: 
+        row: 6
+        column: 4
+      person:
+        row: 7
+        column: 4
+      reciver:
+        row: 8
+        column: 4
+      projective_name:
+        row: 9
+        column: 4
+      start: 
+        row: 10
+        column: 4
+      end: 
+        row: 11
+        column: 4
+      pt_count: 
+        row: 3
+        column: 9
+      signal_frec:
+        row: 4
+        column: 9
+      area: 
+        row: 5
+        column: 9
+      outline_length: 
+        row: 6
+        column: 9
+      min_epochs: 
+        row: 7
+        column: 9
+      max_pdop: 
+        row: 8
+        column: 9
+      min_satellites: 
+        row: 9
+        column: 9
+      work_days:
+        row: 10
+        column: 9
+      work_time:
+        row: 11
+        column: 9
+
+    # 測定結果の詳細
+    result_cells:
+      pt_num_first:
+        row: 15
+        column: 1
+      pt_name_first:
+        row: 15
+        column: 2
+      lon_first:
+        row: 15
+        column: 3
+      lat_first:
+        row: 15
+        column: 4
+      epochs_first:
+        row: 15
+        column: 5
+      pdop_first:
+        row: 15
+        column: 6
+      satellites_first:
+        row: 15
+        column: 7
+      y_first:
+        row: 15
+        column: 8
+      x_first:
+        row: 15
+        column: 9
+
+  detail_sheet:
+    sheet_name: 詳細データ
+    cells_start: 
+      row: 2
+      column: 1
+
+
+epsg_codes:
+  東北（福島を除く）: 6678
+  関東（福島を含む）: 6677
+  静岡、山梨、長野、新潟: 6676
+
+

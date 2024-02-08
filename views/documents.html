@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<style>
+    h1.black {
+        color: rgb(0, 0, 0);
+        text-align: center;
+        margin-bottom: 1px;
+    }
+    h2.black {
+        color: #020202;
+    }
+    h2.blue {
+        color: #008899;
+    }
+    p.margin {
+        line-height: 1.5;
+    }
+    p.margin_bold {
+        line-height: 1.5;
+        font-weight: bold;
+    }
+    p.right {
+        text-align: right;
+    }
+    summary.bigest {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    li.margin {
+        line-height: 1.3;
+        padding-top: 4px;
+        padding-bottom: 7px;
+    }
+    table {
+        border-collapse: collapse;
+    }
+    table th{/*thに対して*/
+        background: #dcdddd;/*背景色*/
+        border: solid 1px black;
+    }
+    /* <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;"> */
+    /* <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;"> */
+</style>
+<body>   
+    <div id="simple_surveying_doc">
+        <h1 class="black">1つのファイルから<br>一筆書きのデータを作成する</h1>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">このページでは DroggerGPS（スマホアプリ）から出力された1つの"way-point.gpx"ファイルを処理して一筆書きのデータを作成する説明をしています。</p>
+            <br>
+        <h2 class="blue">どの様にしてデータを処理するのか</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                "way-point.gpx"の中に保存されているデータは"Point"型のデータです。"Point"とは単純に測点のデータの様なもので、これを線で繋いでやらなければ周囲長や面積を測る事は出来ません。その為このアプリでは概要データの入力等と共に、並べ替えの方法を選択する事で、順番に"Point"を繋いで区域を囲む線を作成します。
+            </p>
+            <br>
+        <h2 class="blue">1. サイドバーへの入力</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">"サイドバー"とはアプリ立ち上げ時に左側に表示される灰色の場所の事を指しています。</p>
+            <ol>
+                <li class="margin">
+                    <p class="margin">
+                        まずはデータを読み込む必要があります。DroggerGPSを使用したならば、スマホをPCに接続して
+                    <p class="margin">
+                    <p class="margin">「Android -> data -> jp.bizstation.drgps」</p>
+                    <p class="margin">
+                        の場所に「測量日_way-point.gpx」の名前で保存されています。サイドバー上部に「測量データを読み込む」欄があるので、そのファイルをドラッグ＆ドロップで入力しましょう。
+                    <p class="margin">
+                </li>
+                <li class="margin">
+                    データを入れるとサイドバーに「追加情報の入力」欄が現れます。"国有林名"までは自動で入力されますが、"林小班"なども入力しましょう。国有林名などは推定値を入れてあるだけなので、間違っていた場合は訂正しましょう。
+                </li>
+                <li class="margin">
+                    追加情報の入力が終わると、自動的に計算が始まります。「メインページ」タブにて、現在の測量結果を確認する事が出来ます。
+                </li>
+                <li class="margin">
+                    「メインページ」下側を見ると動く図面があります。デフォルトで"班名"が入力され、測点ラベルに"A"が入力されているのがわかります。
+                </li>
+                <li class="margin">
+                    もしも1班での測量であればサイドバーの「測量データを読み込む」欄でファイルの詳細を設定する事が出来る、折り畳みウィジェットがあるので、それを開き"班名"を空欄にして下さい。折り畳みウィジェットに関しては、別ページで解説しています。
+                </li>
+            </ol>
+            <br>
+        <h2 class="blue">2. データの確認</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                「メインページ」タブを下にスクロールしていくと、読み込んだデータの詳細を見る事が出来るので、データを出力する前にいくつか確認する必要があります。
+            </p>
+            <ol>
+                <li class="margin">
+                    まずは「GNSSの計測結果をMapで表示する」欄を見ます。ここには"Point"を設定された順番で繋いだ場合の区域が描かれています。
+                </li>
+                <li class="margin"><p class="margin">並び変えを変更する方法はいくつかあり</p>
+                    <ol>
+                        <li class="margin">
+                            サイドバーのファイル別"折り畳みウィジェット"から「並び替え列」を変更する
+                        </li>
+                        <li class="margin">"折り畳みウィジェット"から「並び替え」の方法を変更する</li>
+                        <li class="margin">
+                            メインページ上側の「編集用テーブル」で行をドラッグ＆ドロップで入れ替える
+                        </li>
+                    </ol>
+
+                    <p class="margin">
+                        上記3つの方法があります。編集用テーブルを調整した場合は、"Update"ボタンを押さなければ更新されないので注意しましょう。
+                    </p>
+                </li>
+                <li class="margin">
+                    不要な測点がある場合は、「編集用テーブル」でチェックを入れ"Update"ボタンを押してください。
+                </li>
+                <li class="margin">
+                    収穫調査規定を満たさない測点がある場合は「確認用テーブル」下部に赤字で表示されます。
+                </li>
+                <li class="margin">
+                    最後に「ファイル出力」タブ内の「データの保存」タブを開き、上側に「セミダイナミック補正済み👍」と表示されていればOKです。
+                </li>
+            </ol>
+            <br>
+        <h2 class="blue">3. データの出力</h2>
+            <hr style="margin-top: 0px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">データの確認が済んだら、最後にデータを出力しましょう。</p>
+            <h4>測量野帳の出力</h4>
+                <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                <p class="margin">
+                    測量野帳はExcelとして出力されます。シートが二つ用意されており、片方には測量野帳の概要を、片方には測定結果の詳細が入力されています。
+                </p>
+            <h4>DTAファイルのダウンロード</h4>
+                <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                <p class="margin">
+                    「実測図作成システム」で使用可能な".DTA"ファイルがダウンロード出来ます。".csv"ファイルもこちらからダウンロード出来ます。
+                </p>
+            <h4>GeoJSONファイルのダウンロード</h4>
+                <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                <p class="margin">
+                    GISのデータとしてGeoJSONがダウンロードできます。「ファイル結合」「実測図作成」などでも使用するファイルです。
+                </p>
+            <h4>KMLファイルのダウンロード</h4>
+                <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                <p class="margin">
+                    GoogleEarthやGoogleMapなどで使用するファイルです。
+                </p>
+    </div>
+    <div id="multiple_surveying_doc">
+        <h1 class="black">複数のファイルから<br>一筆書きのデータを作成する</h1>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                このページでは DroggerGPS（スマホアプリ）から出力された複数の"way-point.gpx"ファイルを処理して一筆書きのデータを作成する説明をしています。
+            </p>
+            <p class="margin">
+                これを読む前にまず<b>「1つのファイルから一筆書きのデータを作成する」</b>を読んで下さい。
+                一つ一つの機能はそちらで解説しています。
+            </p>
+            <h2 class="blue">どの様にしてデータを処理するのか</h2>
+                <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+                <p class="margin">
+                    "way-point.gpx"の中に保存されているデータは"Point"型のデータです。"Point"とは単純に測点のデータなので、これを線で繋がなければ周囲長や面積を測る事は出来ません。その為このアプリでは並べ替えの方法を選択する事で、並べ替え後順番に"Point"を繋いで区域を囲む線を作成します。
+                </p>
+                <br>
+            <h2 class="blue">複数のファイルをどのように1つの区域とするのか</h2>
+                <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+                <p class="margin">
+                    例えば大面積の場所をA、B、C班に分かれて測量を行ったとします。
+                </p>
+                <p class="margin">
+                    コンパス測量する場合であれば、1号点を決めたら2つの班がその場所から別々の方向に測量を始めます。しかしGNSS測量ではそうではありません。なぜなら測量成果は絶対座標であり、測るたびに微妙に位置がずれる事が明らかなので、同じ場所を測ってはいけません。現地調査時にはこのページの一番下にある画像の様に、別々な位置から測量を始めるようにして下さい。
+                </p>
+                <p class="margin">
+                    このアプリでは複数ファイルを繋ぐ場合、左側にあるサイドバーで、ファイル毎に4つの項目を設定する事が出来ます。
+                </p>
+                <h4>ファイル番号</h4>
+                    <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                    <p class="margin">
+                        これはファイルとファイルを繋ぐ優先順位です。このページの一番下にある画像の様にA-1から始まり、B-1で終わる様な一筆書きの区域を作る場合は「A班成果 -> C班成果 -> B班成果」という順番にしたいので、下のテーブルの様にファイル番号を設定します。
+                    </p>
+                    <table border="1">
+                        <tr>
+                        <th> </th><th>A班成果</th><th>C班成果</th><th>B班成果</th>
+                        </tr>
+                        <tr>
+                        <td>ファイル番号</td><td>1</td><td>2</td><td>3</td>
+                        </tr>
+                    </table>
+                    <br>
+                <h4>班名</h4>
+                    <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                    <p class="margin">
+                        各測点名に結合され、図面作成の際に"ラベル付け"や"色分け"、"マーカーサイズ"の自動設定に使用されます。単独班で計測した場合は空白にして下さい。
+                    </p>
+                    <br>
+                <h4>並べ替え列</h4>
+                    <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                    <p class="margin">
+                        これは並べ替えに使用する列を設定します。選択可能な列は3つあり、選択した列で並び替え、その順番に測点を繋いで行く事になります。
+                    </p>
+                    <ol>
+                        <li class="margin">測定終了日時 = 各測点の測り終わった日時で並び替え</li>
+                        <li class="margin">測点番号 = 各測点の番号（整数値）で並び替え</li>
+                        <li class="margin">測点名 = 測点名を数値に変換して並び替え</li>
+                    </ol>
+                    <br>
+                <h4>並べ替え</h4>
+                    <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                    <p class="margin">
+                        並び替えは"昇順"にするか"降順"にするかを選択出来ます。
+                    </p>
+                    <ol>
+                        <li class="margin">昇順 = 1,2,3,...10</li>
+                        <li class="margin">降順 = 10,9,8,...1</li>
+                    </ol>
+                    <br>
+                <p class="margin">
+                    ここまでをまとめると、下の画像の様な測量を行った場合は以下のテーブルの様にサイドバーで設定をしましょう。その他の手順は<b>「1つのファイルから一筆書きのデータを作成する」</b>と同じなのでここでは説明しません。
+                </p>
+                <table border="1">
+                    <tr>
+                    <th> </th><th>A班</th><th>C班</th><th>B班</th>
+                    </tr>
+                    <tr>
+                        <td>ファイル番号</td><td>1</td><td>2</td><td>3</td>
+                    </tr>
+                    <tr>
+                        <td>班名</td><td>A</td><td>C</td><td>B</td>
+                    </tr>
+                    <tr>
+                        <td>並べ替え列</td><td>測点名</td><td>測点名</td><td>測点名</td>
+                    </tr>
+                    <tr>
+                        <td>並べ替え</td><td>昇順</td><td>昇順</td><td>降順</td>
+                    </tr>
+                </table>
+                <br>
+    </div>
+    <div id="revision_doc">
+        <h1 class="black">測点名の命名規則と<br>測点の修正</h1>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                測量を行うと、「途中に1点追加したい」「途中の数点を修正したい」「数点消したい」などという事が度々あります。このページではそういった場合どの様にすればいいのかを解説していきます。
+            </p>
+            <p class="margin">
+                これを読む前にまず<b>「1つのファイルから一筆書きのデータを作成する」</b>を読んで下さい。
+                一つ一つの機能はそちらで解説しています。
+            </p>
+        <h2 id="preprocessing_2" class="blue">測点名の命名規則</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                DroggerGPS（スマホアプリ）では測量を行った際に、下の二つの項目を入力する事が出来ます。
+                <ol>
+                    <li class="margin">測点番号 = 整数値</li>
+                    <li class="margin">測点名 = 文字列</li>
+                </ol>
+            </p>
+            <p class="margin">
+                通常であれば測点番号を使用して線で繋いで行くのですが、このアプリでは<b>測点名に浮動小数点を入力</b>する事を推奨しています。
+            </p>
+            <p class="margin">
+                測点番号には整数値しか入力できません。その為、測点名を使用して並び替えした場合は、例えば後から2号点と3号点の間に測点を追加しようと思ったとしても、全ての測点の番号を修正するか、手動で繋いでいくしか方法がなくなります。
+            </p>
+            <p class="margin">
+                測点名には入力規制がありませんので、<b>通常は整数値を入力</b>しておくとして、2号点と3号点の間に追加したければ<b>「2.1」や「2.2」などの浮動小数点数を入力</b>します。そうする事で測点名で並び替えした時に、意図した順番に自動で線で繋いでくれるようになります。
+            </p>
+            <br>
+        <h2 id="preprocessing_2" class="blue">測点の入れ替えと削除を行う</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                測点を修正する場合は、<b>削除したり、位置を変えたり</b>する場合もあります。その場合は「メインページ」にある<b>編集用テーブル</b>を利用して下さい。
+            </p>
+            <p class="margin">
+                <b>編集用テーブル</b>には、自動並べ替え後のテーブルが表示されています。このテーブルの左側にある<b>チェックボックス</b>にチェックする事でその測点を計算対象から外す（削除）する事が出来ます。測点の位置を入れ替える場合は<b>ドラッグ＆ドロップ</b>で簡単に入れ替える事も出来ます。
+            </p>
+            <p class="margin">
+                これらは<b>編集用テーブル</b>左上にある<b>Update</b>ボタンを押す事で計算に反映されます。この計算は元データには影響しないので安心してどうとでも扱ってみてください。
+            </p>
+    </div>
+    <div id="create_map_doc">
+        <h1 class="black">実測図の作成</h1>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                このアプリで出力したデータを読み込む事で、<b>実測原図</b>と<b>実測位置図</b>を簡単に作成する事が出来ます。
+            </p>
+            <h2 class="blue">読み込めるデータ</h2>
+                <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+                <p class="margin">
+                    このアプリで出力可能なデータには色々な種類がありますが、図面の作成に利用できるのは<b>GeoJSON（.geojson）</b>フォーマットのデータだけです。
+                </p>
+                <p class="margin">
+                    その<b>GeoJSON</b>の中でも、使用可能なのは以下の2種類です。
+                </p>
+                <h5>1. xxx_PnP.geojson</h4>
+                    <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                    <p class="margin">
+                        "Point"と"Polygon"の両方のデータが保存されているので1つのファイルで実測図が作成可能。
+                    </p>
+                <h5>2. xxx_Point.geojson と xxx_Poly.geojson</h4>
+                    <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                    <p class="margin">
+                        "Point"と"Polygon"のデータが別々に入力されているので、両方のデータを使用する事で、実測図が作成可能。
+                    </p>
+                    <br>
+            <h2 class="blue">1. GeoJSONデータの読み込み</h2>
+                <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+                <p class="margin">
+                    「ファイル出力」タブを開き、その中にある「実測図作成」タブを開きます。
+                </p>
+                <p class="margin">
+                    <b>GeoJSONデータの読み込み</b>という欄があるので、そこにデータをドラッグ＆ドロップで入力して下さい。
+                </p>
+                <br>
+            <h2 class="blue">2. 平面直角座標系の選択</h2>
+                <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+                <p class="margin">
+                    座標系の選択は重要です。正しい形で作図する為に局所的な座標系を設定する必要があります。しかしデフォルトで東北が選択されているのであまり気にしなくとも良いでしょう。
+                </p>
+                <br>
+            <h2 class="blue">3. 図面の設定</h2>
+                <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+                <p class="margin">
+                    ここで図面に関する様々な設定を変更できます。設定項目はたくさんありますが、ここでは分かりづらそうな項目だけ説明します。
+                </p>
+                <h5>図面にタイトルを追加する</h4>
+                    <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                    <p class="margin">
+                        図面上に森林管理署名や林小班などが入力されたタイトルを挿入します。タイトルはGeoJSONのデータ作成時に入力した要素が自動で設定されていますが、変更する事も可能です。
+                    </p>
+                    <br>
+                <h5>除地を計算する</h4>
+                    <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                    <p class="margin">
+                        林地面積を計算し計算の詳細をラベルとして左下に表示します。除地は7つまで入れる事が可能で、除地の種類や面積は手動で入力する必要があります。
+                    </p>
+                    <br>
+                <h5>その他の細かな設定</h4>
+                    <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+                    <ul>
+                        <li class="margin">
+                            <b>班別に測点の色を変える</b><br>
+                            <p class="margin">
+                                A班、B班などの班別に測点の色を変更します。デフォルトでONになっていますが、OFFにすると全ての測点が<b>区域の色を変更</b>に従う色に変わります。
+                            </p>
+                        </li>
+                        <li class="margin">
+                            <b>調査指定面積の追加</b><br>
+                            <p class="margin">
+                                左下に表示される<b>計測概要ラベル</b>に収穫調査の指定面積を追加します。
+                            </p>
+                        </li>
+                    </ul>
+                    <br>
+            <h2 class="blue">4. 実測原図の作成</h2>
+                <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+                <p class="margin">
+                    実測原図のPDFを作成し、ダウンロードできます。
+                </p>
+                <br>
+            <h2 class="blue">5. 実測位置図の作成</h2>
+                <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+                <p class="margin">
+                    実測位置図は基本図の画像（.jpg, .png, .tif）などを読み込み、実測結果を重ねる事が出来ます。ラベルや色、用紙サイズなどの設定は<b>実測原図</b>を作成したものを引き継ぐので、変更したい場合は戻って調整して下さい。
+                </p>
+                <p class="margin">
+                    ここで読み込まれた画像は、設定された用紙サイズに拡大縮小されるわけではなく、左上を原点として右下に向かう形で、設定された用紙サイズにトリミングされます。
+                </p>
+                <p class="margin">
+                    <a href="https://www.rinya.maff.go.jp/tohoku/keikaku/kokuyuurinzumen.html">
+                        東北森林管理局のHP
+                    </a>
+                    からダウンロードした基本図を、PDF編集ソフトを使用して、対象箇所が中央に来る状態でトリミングすると思いますが、その時にあまり細かくサイズ調整しなくとも、縮尺は正しいままで読み込まれます。
+                </p>
+                <p class="margin">
+                    ※縮尺は1/5000にしか対応させていません。
+                </p>
+                <br>
+    </div>
+    <div id="marge_doc">
+        <h1 class="black">複数のGeoJSONファイルを結合する</h1>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                実際の区域には様々な形があります。
+                <ul>
+                    <li class="margin">
+                        複層伐で区域が複数に分かれている
+                    </li>
+                    <li class="margin">
+                        1つの小班が貸付地などで分断され、複数に分かれている
+                    </li>
+                    <li class="margin">
+                        小班内に鉄塔敷などの貸付地があり、ドーナツ型に穴が開いている
+                    </li>
+                </ul>
+            </p>
+            <p>
+                上記の場合は一筆書きで区域を表現する事は不可能です（橋渡しを除く）。
+            </p>
+            <p>
+                このアプリでは上記の様な場合は、1つ1つの区域を別々のGeoJSONファイルとして出力した後に「データ結合」タブでそのデータを結合し、1つのファイルに纏める事が出来ます。
+            </p>
+        <h2 class="blue">結合後のデータ</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                結合後にどの様に利用したいかによって、以下のどちらかを選択し処理を進める事になります。
+                <ul>
+                    <li class="margin">
+                        <b>複数のGeoJSONからGISデータへ</b>
+                        <p>
+                            GeoJSONとKMLが出力できます。
+                        </p>
+                    </li>  
+                    <li class="margin">
+                        <b>複数のGeoJSONからDTAへ</b>
+                        <p>
+                            連結線が入力されたDTAファイルの圧縮ファイルがダウンロードできます。
+                        </p>
+                    </li>
+                </ul>
+            </p>
+            <br>
+        <h2 class="blue">複数のGeoJSONからGISデータへの場合</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <h4>1. データの読み込み</h4>
+                <p class="margin">
+                    読み込めるデータのフォーマットはGeoJSONだけです。<b>xxx_PnP.geojson</b>か<b>xxx_Points.geojsonとxxx_Poly.geojson</b>を入力して下さい。
+                </p>
+                <br>
+            <h4>2. 区域の重ね方を選択</h4>
+                <p class="margin">
+                    ファイルを結合する為、ファイル毎に「メインの区画」「外側の区画」「内側の区画」のどれかを選択して下さい。<b>メインの区画</b>は1つしか選択出来ません。
+                </p>
+                <ul>
+                    <li class="margin">
+                        <b>メインの区画</b>
+                        <p>全ての区画の元となる区画。</p>
+                    </li>
+                    <li class="margin">
+                        <b>外側の区画</b>
+                        <p>メインの区画と結合して、下地になる区画。</p>
+                    </li>
+                    <li class="margin">
+                        <b>内側の区画</b>
+                        <p>メインの区画と外側の区画から差し引かれる区画（除地）。</p>
+                    </li>
+                </ul>
+                <p>
+                    上記を設定すると、下側に見えているマップが変化します。マップ内にある青緑色の区域が、結合後の区域になります。
+                </p>
+                <br>
+        <h2 class="blue">複数のGeoJSONからDTAへの場合</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                実測図作成システムで図面を作成する場合はDTAで出力する必要があります。GNSS測量の成果は絶対座標なので、連結線を測る必要はありませんが、実測図作成システムで使用する為には連結線が必要なので、ここで<b>どの点</b>と<b>どの点</b>を繋ぐかを選択します。
+            </p>
+            <br>
+            <h4>1. データの読み込み</h4>
+                <p class="margin">
+                    読み込めるデータのフォーマットはGeoJSONだけです。<b>xxx_PnP.geojson</b>か<b>xxx_Points.geojsonとxxx_Poly.geojson</b>を入力して下さい。
+                </p>
+                <br>
+            <h4>2. メインファイルとサブファイルに分ける</h4>
+                <p class="margin">
+                    実測図作成システムの仕様上、メインの区画からサブの区画へと連結線を伸ばす必要があります。ここでどのファイルをメインの区画とするのかを選んで下さい。
+                </p>
+                <br>
+            <h4>3. 連結する測点を選択する</h4>
+                <p class="margin">
+                    メインの区画を選択すると、この項目が表示されます。マップは動的であり、拡大縮小出来るので、連結する為の測点を選択して下さい。
+                </p>
+                <br>
+            <h4>4. 圧縮ファイルのダウンロード</h4>
+                <p class="margin">
+                    連結線を計算したら、圧縮ファイルがダウンロードできます。この圧縮ファイルには、各区画のDTAファイルが保存されているので、解凍してそのまま管理して下さい。
+                </p>
+                <br>
+            <h4>5. 実測図作成システムで使用する</h4>
+                <p class="margin">
+                    圧縮ファイルを解凍したフォルダには元のファイルと同じ名前のファイルが保存されています。この中からメインの区画のファイルを実測図作成システムで読み込むと、連結線が入り、複数の区画が描かれた図面を作成する事が出来ます。
+                </p>
+    </div>
+    <div id="warning_dta">
+        <h1 class="black">DTAファイルの注意点</h1>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                <b>
+                    「このアプリ上で計算される実測面積」と「実測図作成システムで計算される実測面積」は微妙に異なります。
+                </b>
+            </p>
+            <p class="margin">
+                原因は簡単で、実測図作成システムでは<b>方位角が0.1度単位</b>、<b>距離は10cm単位</b>でしか入力できない為です。実測図作成システムの仕様に合わせる為、それ以下の小数点数は四捨五入してからDTAファイルとして出力しています。その違いは僅かなもので、実測図を作成する場合には問題となりませんが、面積や周囲長の数値が正しいのはこのアプリで見られる数値の方なので、注意して下さい。
+            </p>
+    </div>
+    <div id="warning_kml">
+        <h1 class="black">KMLファイルの注意点</h1>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                <b>
+                    GISで利用するデータを保存するならばGeoJSONがおススメです。KMLはGoogle関連のアプリで表示する場合のみ使用して下さい。
+                </b>
+            </p>
+        <h2  class="blue">何故 KML がおススメ出来ないのか</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                このアプリでは複数の区画を結合し、1つに纏める事が出来ます。この複数の結合された区画の事を <b>MultiPolygon型</b> と呼びます。
+            </p>
+            <p class="margin">
+                KML(keyhole Markup Language)はKeyhole（現在のGoogleEarth）を作った会社が作成したデータのフォーマットであり、XMLという構造をベースとしていますが、csvやjsonと比べて構造が複雑になっています。
+            </p>
+            <p class="margin">
+                このアプリでは複数の<b>Polygon</b>を組み合わせて<b>MultiPolygon</b>を作成していますが、<b>MultiPolygon</b>も複雑ですし<b>KML</b>も複雑なので、大抵のアプリでは正しく読み込めません。例外は<b>KML</b>を主としている<b>GoogleEarth</b>やGIS専門会社のEsriがリリースしている<b>ArcGIS Pro</b>等です。実際に1つの小班内に複数の鉄塔敷があったと仮定し<b>MultiPolygon</b>を作成、そのファイルを読み込ませたところ、上記2つのアプリでしか正しく表示されず、QGISや地理院地図だと正しく表示されませんでした。
+            </p>
+            <p class="margin">
+                上記で説明したように、GoogleEarthで使用するならばKMLで保存しても問題ありませんが、他でも利用する予定があるならば、KMLではなくGeoJSONで保存した方がいいでしょう。
+            </p>
+    </div>
+    <div id="output_data_doc">
+        <h1 class="black">出力データの詳細</h1>
+        <hr style="margin-top: 5px; margin-bottom: 20px; border: 3px solid #dcdddd;">
+        <p class="margin">
+            出力されるデータの列名（Field）を説明しています。このアプリでは "日本語" と "英語" 両方選択できるので、英語の方は括弧書きで表記しています。
+        </p>
+        <ol>
+            <li class="margin">
+                <p class="margin_bold">idx（idx）</p>
+                <p>インデックス番号。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">測定開始日時（start）</p>
+                <p>
+                    ポイント型の場合は平均化を開始した日時。ポリゴン型の場合は含まれる測点の中で最も過去の平均化を開始した日時。
+                </p>
+            </li>
+            <li class="margin_bold">
+                <p class="margin">測定終了日時（end）</p>
+                <p>
+                    ポイント型の場合は平均化を終了した日時。ポリゴン型の場合は含まれる測点の中で最も過去の平均化を終了した日時。
+                </p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">測点番号（pt_num）</p>
+                <p>整数値。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">測点名（pt_name）</p>
+                <p>文字列、「A-1」など班名も含まれる。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">経度（longitude）</p>
+                <p>GNSSで計測された今期座標の数値。</p>
+            </li>
+            <li>
+                <p class="margin_bold">緯度（latitude）</p>
+                <p>GNSSで計測された今期座標の数値</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">標高（altitude）</p>
+                <p>GNSSで計測された数値。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">Fix解（fix_mode）</p>
+                <p>"3D GNSS", "3D", "2D", "FLOAT"など。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">測定回数（epochs）</p>
+                <p>平均化した数。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">測定間隔（interval）</p>
+                <p>平均化前の各測定ごとの間隔。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">PDOP（pdop）</p>
+                <p>
+                    位置精度低下率（Position Dilution of Precision）。ある程度の精度閾値としては使用できるが、実際にこの値が低い方が精度が良いとは限らない。
+                </p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">衛星数（satellite_signals）</p>
+                <p>平均化に使用した衛星の数。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">水平標準偏差（std_h: horizontal standard deviation）</p>
+                <p>
+                    取得座標の水平方向標準偏差。平均化位置からのデータのバラつきを表す指標でRMSと呼ばれる場合もあり、平均座標と各座標との差の2乗の平方根を取った値。簡単に考えるならば、平均化に使用した測定位置の68%がstd_hメートルの範囲内にあるというイメージ。
+                </p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">垂直標準偏差（std_v: vertical standard deviation）</p>
+                <p>取得座標の垂直方向標準偏差。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">衛星信号（satellite_signals）</p>
+                <p>
+                    仕様した衛星の種類。"L2"が入っていれば2周波で計測出来ている。"L1"は1周波。収穫調査規定ではL2でなければ小さな面積、あるいは短い距離を計測出来ない事になっている。
+                </p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">信号の周波数（signal_frecuencies）</p>
+                <p>1周波ならば"1"、2周波ならば"2"が入力される。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">測定機器（receiver）</p>
+                <p>GNSSのアンテナ名。</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">projective_technique_epsg（平面直角座標系(EPSG)）</p>
+                <p>
+                    平面直角座標系2011年のEPSGコード。セミダイナミック補正しなければ入力されない。
+                </p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">Y(lon)（transformed_y）</p>
+                <p>セミダイナミック補正後の元期（げんき）座標。混乱しやすいが、Yは横座標</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">X(lat)（transformed_x）</p>
+                <p>セミダイナミック補正後の元期（げんき）座標。混乱しやすいが、Xは縦座標</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">森林管理署名（office）</p>
+                <p>サイドバーで入力した森林管理署の名前</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">森林事務所（branch_office）</p>
+                <p>サイドバーで入力した森林事務所の名前</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">国有林名（local_area）</p>
+                <p>サイドバーで入力した国有林の名前</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">林小班（address）</p>
+                <p>サイドバーで入力した林小班の名前</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">事業年度（year）</p>
+                <p>サイドバーで入力した事業年度</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">事業名（project_name）</p>
+                <p>サイドバーで入力した事業年度</p>
+                </li>
+            <li class="margin">
+                <p class="margin_bold">測量者（person）</p>
+                <p>サイドバーで入力した測量者の名前</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">group（group）</p>
+                <p>サイドバーで入力したファイル別の班名</p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">color（color）</p>
+                <p>
+                    16進数のカラーコード。班名に対応して自動で入力される。図面作成などで、班別の色分けで使用。
+                </p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">label（label）</p>
+                <p>
+                    班別に5点ごとに入力される測点名。地図作成の際にラベルとして使用。
+                </p>
+            </li>
+            <li class="margin">
+                <p class="margin_bold">size（size）</p>
+                <p>
+                    班別に測点番号別に入力されるマーカーサイズ。地図作成の際にマーカーの大きさを変えるのに使用される。
+                </p>
+            </li>
+        <ol>
+    </div>
+    <div id="sync_doc">
+        <h1 class="black">実測結果の共有</h1>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                「実測結果の共有」では作成したGeoJSONのデータ（ポリゴンかラインのみ）をArcGIS Onlineにアップロード（共有）する事が出来ます。共有したデータはスマホアプリのFieldMapsでも見る事が出来るので、実測が終了したその日にデータを共有し、スマホを持つ全員がマップで確認出来る様になります。
+            </p>
+            <p class="margin">※インターネットに接続していないと表示されません。</p>
+        <h2 id="preprocessing_2" class="blue">サインイン</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                データを共有する為には、ArcGIS Onlineのアカウントが必要になりまが、普段スマホアプリのFieldMapsで使用しているアカウントと同じものです。
+            </p>
+            <br>
+        <h2 id="preprocessing_2" class="blue">アイテム検索</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                データを共有するには、共有したい実測データを保存する為の箱が必要になるので、その箱をクラウド上から探す必要があります。今回はGNSSでの測量結果を共有したいので検索欄に「GNSS」と入力して下さい、小文字でも大文字でも構いません（全角で入力しない様に）。
+            </p>
+            <ul>
+                <li class="margin">
+                    GNSS_Polygon = 区画のデータを共有するならこちらを選択
+                </li>
+                <li class="margin">
+                    GNSS_Line = 線のデータを共有するならこちらを選択
+                </li>
+            </ul>
+            <br>
+        <h2 id="preprocessing_2" class="blue">GeoJSONデータの読み込み</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p>どちらかのデータをドラッグ＆ドロップで入れて下さい。</p>
+            <ul>
+                <li class="margin">
+                    xxx_Poly.geojson
+                </li>
+                <li class="margin">
+                    xxx_Line.geojson
+                </li>
+            </ul>
+            <p class="margin">
+                ※適当に編集したデータを入れないで下さい。データ型チェックやデータの中身チェックの機能は持たせていますが、予期しない動作をする可能性があります。
+            </p>
+            <p class="margin">
+                データを入れるとクラウドに保存されているデータに、同じ林小班のデータが存在するかを検索します。存在しない場合は表示される指示に従って許可を出すと、データを追加する事が出来ます。
+            </p>
+            <br>
+        <h2 id="preprocessing_2" class="blue">同じ名前の林小班がすでに保存されている場合</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                同じ林小班が存在する場合は、「気にせず追加する」か「クラウド内のデータを削除する」かのどちらかを選択して下さい。
+            </p>
+            <p class="margin">
+                下にマップが表示されるのでそれを見てから決めましょう。左側にレイヤーリストがあり、チェックボックスにチェックを入れたり外したりで、各データの表示を入れ替える事が出来ます。
+            </p>
+            <br>
+    </div>
+    <div id="semidyna_doc">
+        <h1>セミダイナミック補正</h1>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                このページではセミダイナミック補正に関してと、その補正方法について解説しています。
+            </p>
+        <h2 class="blue">セミダイナミック補正とは</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">
+                日本列島はプレート境界に位置しているため、 顕著な地震などがなくても、
+                少しずつ地殻変動が蓄積されていきます。地殻変動に伴うひずみは測量の結果精度に影響を及ぼし、
+                その影響は年々大きくなっていきます。このひずみの影響を補正する方法が「セミ・ダイナミック補正」です。
+            </p>
+            <p class="margin">
+                例えば国土数値情報ダウンロードサイトで公開されている、国有林の小班区画データは座標系が
+                「JGD2011（B, L）」と書いてあり、2011年の座標が使用されている事がわかります。
+            </p>
+            <p class="margin">
+                小班区画データなどの "既にあるデータ" と "新しくGNSSで測定したデータ"
+                を重ねて扱う為には、新しく取得したデータの地殻変動を補正し、
+                20xx年（今期）から2011年（元期：げんき）のデータへ変換する必要があります。
+                東北は震災の影響で特に地殻変動が大きく、青森支部駐車場で確かめると
+                2023年（今期）の座標と2011年（元期）の座標では、南東方向に65cm程、
+                岩手県石巻市では1.41m程度のズレがありました。
+                元期から今期へ、あるいは今期から元期への座標補正をセミ・ダイナミック補正と呼びます。
+            </p>
+        <h2 class="blue">どの様に補正するのか</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <p class="margin">セミダイナミック補正を行う方法は色々あります。</p>
+            <ul>
+                <li class="margin">
+                    DroggerGPS（スマホアプリ）で設定し自動で行う。この方法が一番簡単です。
+                </li>
+                <li class="margin">
+                    地理院の測量計算サイトでセミダイナミック補正を行う。
+                </li>
+                <li class="margin">
+                    地理院の公開しているAPIを使用して補正を行う。このアプリではこちらを使用しています。
+                </li>
+            </ul>
+            <br>
+        <h3>DroggerGPSでの補正</h3>
+            <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+            <p class="margin">
+                DroggerGPS（スマホアプリ）を使用してセミダイナミック補正を行うのが最も簡単です。年1回4月にパラメーターファイルを更新してあげる必要はありますが、
+                設定してしまえば自動で補正してくれます。以下にその手順も含めて書いてありますので、WiFiなどがある環境で設定を行いましょう。
+            </p>
+            <ol>
+                <li class="margin">
+                    アプリ画面上部の「歯車マーク（設定）」を開く
+                </li>
+                <li class="margin">
+                    下にスクロールして、「<font color="#0095d9">測量</font>」欄の「表示座標系」を開く
+                </li>
+                <li class="margin">
+                    「<font color="#0095d9">Semi Dynamic corection(Only in Japan)</font>」
+                    欄のパラメータファイル管理を開く
+                </li>
+                <li class="margin">
+                    最新年度の欄「例）<font color="#0095d9">2023年度</font>」
+                    などを<b>長押し</b>する。右上に「INSTALL」と出るので選択。
+                    選択年度が「Installed」になればOK（※WiFiに接続されていないとダウンロード出来ません）
+                </li>
+                <li class="margin">
+                    「<font color="#0095d9">Semi Dynamic corection(Only in Japan)</font>」
+                    欄に戻り「元期へ変換または……」のスライドボタンを選択し<font color="#0095d9">オン</font>にする
+                </li>
+                <li class="margin">
+                    「<font color="#0095d9">Coordinate</font>」欄から表示座標系を選択し「<b>平面直角座標系</b>」にチェック
+                </li>
+                <li class="margin">
+                    同欄の「平面直角座標系」で測定場所に合う座標系を選択する。福島を除く東北ならば「<b>10系</b>」福島を含む関東ならば「<b>9系</b>」を選択。その他は「EPSGコード一覧」で検索して下さい
+                </li>
+            </ol>
+            <br>
+        <h3>地理院のHPで補正</h2>
+            <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+            <p>
+                <a href="https://vldb.gsi.go.jp/sokuchi/surveycalc/semidyna/web/index.html">
+                    ここからWebページに行って補正します。
+                </a>
+            </p>
+            <br>
+        <h3>地理院APIでの補正</h3>
+            <hr style="margin-top: 1px; margin-bottom: 10px; border: 1px solid #dcdddd;">
+            <p>
+                このアプリではインターネット接続が出来ていれば、
+                地理院のAPIを使用してセミダイナミック補正を行う事が出来ます。
+            </p>
+            <p>
+                しかしAPIは地理院のサーバーを使用するので、負荷軽減の為に1秒1点までの制限があり、通信に失敗する場合もある為、60点の補正をするのであれば60秒以上掛かる計算になり、あまり早いとは言えません。スマホアプリの設定をし忘れた場合は使用しましょう。
+            </p>
+        <h2 class="blue">関連リンク</h2>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+            <ul>
+                <li>
+                    <a href="https://www.gsi.go.jp/sokuchikijun/chikakuhendo-hosei.html">
+                        地殻変動補正（国土地理院）
+                    </a>
+                </li>
+                <br>
+                <li>
+                    <a href="https://vldb.gsi.go.jp/sokuchi/surveycalc/api_help.html">
+                        測量計算サイトAPI詳細（国土地理院）
+                    </a>
+                </li>
+                <br>
+                <li>
+                    <a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A45.html">
+                        国土数値情報ダウンロードサイト/国有林（国土交通省）
+                    </a>
+                </li>
+                <br>
+                <li>
+                    <a href="https://lemulus.me/column/epsg-list-gis">
+                        日本でよく利用される座標参照系（©LL.me）
+                    </a>
+                </li>
+            </ul>
+    </div>
+</body>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<style>
+    h1.black {
+        color: rgb(0, 0, 0);
+        text-align: center;
+        margin-bottom: 1px;
+    }
+    h2.black {
+        color: #020202;
+    }
+    h2.blue {
+        color: #008899;
+    }
+    p.margin {
+        line-height: 1.5;
+    }
+    p.margin_bold {
+        line-height: 1.5;
+        font-weight: bold;
+    }
+    p.marker {
+        display: inline;
+        line-height: 1.5;
+        background-position: left -100% center;
+        padding-bottom: 0.6em;
+        font-weight: bold;
+        background-size: 200% 0.6em;
+        background-repeat: repeat-x;
+        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0) 50%, rgb(255, 194, 102) 50%);
+        transition: background-position 2s ease 0.1s;
+    }
+    p.right {
+        text-align: right;
+    }
+    summary.bigest {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    li.margin {
+        line-height: 1.3;
+        padding-top: 4px;
+        padding-bottom: 7px;
+    }
+    /* <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;"> */
+    /* <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;"> */
+</style>
+<body>
+    <div id="main_page_summary">
+        <h1 class="black">🌏 GNSS測量の後処理アプリ</h1>
+            <p class="right">（一財）日本森林林業振興会 青森支部</p>
+            <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                このアプリケーションは、GNSSを使用して行った測量データを後処理する為のものです。
+            </p>
+            <p class="marker">
+                現在はDroggerGPSで取得出来る[測量日_way-point.gpx]フォーマットのデータのみに対応しています。
+            </p>
+            <details>
+                <summary class="bigest">このアプリで出来る事</summary>
+                <ul>
+                    <li class="margin">
+                        <p><b>xxx_way-point.gpx のデータ処理</b></p>
+                        <ol>
+                            <li class="margin">単一ファイルを処理してポリゴンまたはラインの作成</li>
+                            <li class="margin">複数ファイルを処理してポリゴンまたはラインの作成</li>
+                            <li class="margin">地殻変動補正</li>
+                            <li class="margin">測量野帳の出力</li>
+                            <li class="margin">DTAファイルの出力（実測図作成システムで使用）</li>
+                            <li class="margin">CSVファイルの出力（収穫調査レポートで使用）</li>
+                            <li class="margin">GeoJSONの出力（GISで使用）</li>
+                            <li class="margin">KMLの出力（GoogleEarthで使用）</li>
+                        </ol>
+                    </li>
+                    <li class="margin">
+                        <p><b>GeoJSON データの結合</b></p>
+                        <p>複数のデータを1つに纏めます。</p>
+                    </li>
+                    <li class="margin">
+                        <p><b>実測原図の作成</b></p>
+                        <p>タイトルや測点番号などが入った実測原図をダウンロードできます。</p>
+                    </li>
+                    <li class="margin">
+                        <p><b>実測位置図の作成</b></p>
+                        <p>基本図の画像を入れると実測位置図も作成できます。</p>
+                    </li>
+                    <li class="margin">
+                        <p><b>実測データの共有</b></p>
+                        <p>ArcGIS Onlineに実測データを共有し、FieldMaps（スマホアプリ）で表示できます。</p>
+                    </li>
+                </ul>
+            </details><br>
+            <p class="margin">
+                ※ 測量成果のデータは、スマホの中の「Android -> data -> jp.bizstation.drgps」に保存されています。
+            </p>
+    </div>
+    <div id="unsuccessful_connect_internet">
+        <p class="margin">
+            インターネット接続されていないので、地理院のAPIを利用したセミダイナミック補正を実行出来ません。
+        </p>
+        <p class="margin">
+            補正したい場合はインターネットに接続するか、Drogger-GPS（スマホアプリ）で後処理のセミダイナミック補正を行って下さい。
+        </p>
+        <p class="margin">
+            Drogger-GPSでの補正方法はこのアプリの「セミダイナミック補正について」タブに記載しています。
+        </p>
+    </div>
+    <div id="edit_table_summary">
+        <br>
+        <h3 class="black">編集用テーブル</h3>
+        <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #008899;">
+        <details>
+            <summary class="bigest">操作概要</summary>
+            <p class="margin">
+                編集用テーブルでは、自動並び替えで処理しきれない、細かな部分を手動で調整する事が出来ます。
+            </p>
+            <ol>
+                <li class="margin">
+                    各行は各測点の情報が入力されている。
+                </li>
+                <li class="margin">
+                    各行（測点）はドラッグ＆ドロップで入れ替える事が出来る。
+                </li>
+                <li class="margin">
+                    各行（測点）で不要なものがあれば、左隅にチェックを入れると計算から除外される。
+                </li>
+            </ol>
+        </details>
+    </div>
+    <div id="wgs84_summary">
+        <h3>WGS84（EPSG:4326）</h3>
+        <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+        <p class="margin">
+            地球上の位置を表すために広域で使用される座標系。経度と緯度の2つの値で表され、地球上のどの場所でも使用する事が可能。
+        </p>
+        <p class="margin">
+            GNSSなどでも使用される座標ですが、局所的な面積や距離を測るのには向いていません。図面を作成する場合、縦が縮み、横が伸びる様な見た目になるので局所的な場所での使用には向いていません。
+        </p>
+    </div>
+    <div id="local_mercator_summary">
+        <h3>平面直角座標系（2011）</h3>
+        <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+        <p class="margin">
+            日本国内で使用される局所的な座標系。現在主に使用されている測地系は2011年を基準にしており、面積や距離を正確に測る場合はこの座標系を選択して下さい。
+        </p>
+        <p id="margin">
+            GISを使用して図面を作成する場合もこの投影法を使用した方が良いでしょう。
+        </p>
+    </div>
+    <div id="web_mercator_summary">
+        <h3>Webメルカトル図法（EPSG:3857）</h3>
+        <hr style="margin-top: 5px; margin-bottom: 10px; border: 3px solid #dcdddd;">
+        <p class="margin">
+            GoogleMapやArcGIS Online、OpenStreetMapなどのウェブ地図で使用される座標系。
+        </p>
+    </div>
+    <div id="select_language_summary">
+        <p class="margin">
+            ここで出力するデータの列名（Field Name）を日本語で出力するか、英語で出力するかを選択する事が出来ます。デフォルトでは日本語が設定されています。
+        </p>
+        <p class="margin">
+            必ずではありませんが、GISの場合列名を日本語にするとエラーが起こるアプリがあります。
+        </p>
+        <p class="margin">
+            例えばArcGISの場合は<b>本当の列名（Field Name）</b>と<b>表示される列名（Alias Name）</b>が区別されており、Field nameに日本語を使用するとエラーになる場合が多くあります。
+        </p>
+    </div>
+    <div id="download_excel_summary">
+        <p class="margin">
+            測量野帳は国有林の収穫調査で提出する為の印刷シートが保存されたExcelファイルです。
+        </p>
+        <p class="margin">
+            シートは2つあり、1つ目は測量の概要が入力された印刷用シート、2つ目には測量の詳細確認用のシートがあります。
+        </p>
+        <p class="margin">
+            様式を変更する場合は、"apps/settings/excel_template.xlsx" と "xls.py" を調整して下さい。
+        </p>
+    </div>
+    <div id="download_dta_summary">
+        <p class="margin">
+            DTAファイルは「実測図作成システム」で使用されるファイルです。
+        </p>
+        <p class="margin">
+            絶対座標から真北の方位角と水平距離を計算し、ファイル化してダウンロードする事が出来ます。
+        </p>
+        <p class="margin">
+            ダウンロードしたデータは「実測図作成システム」で読み込む事が出来ますが、「実測図作成システム」では方位角は0.1°単位、距離も10cm単位でしか処理出来ない為、このアプリ上で計算される面積や周囲長と異なる結果が出力される場合もあるので注意して下さい。
+        </p>
+    </div>
+    <div id="download_geojson_summary">
+        <p class="margin">
+            GeoJSONファイルはGISで使用される地理空間情報データが格納されたJSONフォーマットのファイルです。
+        </p>
+        <p class="margin">
+            <b>ArcGIS Pro</b> や <b>QGIS</b> などのデスクトップアプリはもちろんWeb系のGISアプリでも使用する事が出来ます。
+        </p>
+        <ul>
+            <li class="margin">
+                <a href="https://maps.gsi.go.jp/index_m.html#5/36.104611/140.084556/&base=std&ls=std&disp=1&vs=c1g1j0h0k0l0u0t0z0r0s0m0f1">
+                    地理院地図
+                </a>
+                (地理院地図では空中写真と重ねる事が出来ます <- EPSG:4326)
+            </li>
+            <li class="margin">
+                <a href="https://www.sentinel-hub.com/explore/eobrowser/">
+                    EO Browser
+                </a>
+                （Sentinel2で撮影した最新の衛星画像と重ねる事が出来ます <- EPSG:4326）
+            </li>
+            <li>ArcGIS で作成したWebGISアプリ（組織サイト参照）</li>
+        </ul>
+        <p class="margin">
+            ※他人とファイルをやり取りする、あるいはデータを保存しておくならばこのファイルがおススメです。
+        </p>
+    </div>
+    <div id="download_kml_summary">
+        <p class="margin">
+            KMLファイルはGISで使用される地理空間情報データが格納されたXMLフォーマットのファイルです。
+        </p>
+        <p class="margin">
+            KMLは<b>GoogleEarth</b>や<b>GoogleMap</b>などのアプリケーションで使用する事ができます。
+        </p>
+        <ul>
+            <li class="margin">
+                <a href="https://www.google.co.jp/intl/ja/earth/about/">
+                    Google Earth
+                </a>
+            </li>
+            <li class="margin">
+                <a href="https://www.google.co.jp/maps/dir///@40.830508,140.7224746,14z/data=!4m2!4m1!3e0!5m1!1e1?entry=ttu">
+                    Google Map
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div id="marge_geojson_summary">
+        <h1>📁 データの結合</h1>
+        <hr style="margin-top: 5px; margin-bottom: 20px; border: 3px solid #dcdddd;">
+        <p class="margin">
+            このページの目的は、複数の区画データ（一筆書き）を結合して、1つのデータにまとめる事です。まとめる事で鉄塔敷などのドーナツ型の小班や、複層伐などの分割された区域を1つの小班として、周囲長や面積を計算する事が出来ます。以下に概要は書きますが、詳しい操作方法は「説明書」タブを参考にして下さい。
+        </p>
+        <details>
+            <summary class="bigest">操作概要</summary>
+            <ol>
+                <li class="margin">
+                    「メインページ」タブにて "xxx.way-point.gpx" を読み込み、一筆書きの区域を作成する。
+                </li>
+                <li class="margin">
+                    「ファイル出力」タブにて "xxx_PnP.geojson" または "xxx_Poly.geojson" と "xxx_Point.geojson" の組み合わせをダウンロード。
+                </li>
+                <li class="margin">
+                    出力済みの複数ファイルを読み込む。
+                </li>
+                <li class="margin">
+                    メインの区画を選択する事で、他の区画が内側にあればドーナツ型に、外側にあれば飛び地と判断し、1つのデータにまとめます。
+                </li>
+            </ol>
+        </details>
+        <br>
+    </div>
+    <div id="marge_dta_summary">
+        <h1>📁 データの結合</h1>
+            <hr style="margin-top: 5px; margin-bottom: 20px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                このページの目的は、複数の区画データ（一筆書き）を結合して、1つのデータにまとめる事です。まとめる事で鉄塔敷などのドーナツ型の小班や、複層伐などの分割された区域を1つの小班として、周囲長や面積を計算する事が出来ます。以下に概要は書きますが、詳しい操作方法は「説明書」タブを参考にして下さい。
+            </p>
+            <details>
+                <summary class="bigest">操作概要</summary>
+                <p class="margin">
+                    "xxx.DTA" は複数区画を1つのファイルにまとめる事は出来ません。その為ファイル参照情報を入力した各DTAファイルを圧縮ファイルにしてダウンロードする様にしています。参照情報（ファイルパス）が入力されているので、解凍後にファイルをバラバラにせずそのまま使用して下さい。
+                </p>
+                <p class="margin">
+                    計算の都合上このページでは複数区画を結合した面積を計算できません。面積が必要な場合は「データ結合（複数のGeoJSONからからGISへ）」タブを使用して下さい。
+                </p>
+                <ol>
+                    <li class="margin">
+                        「メインページ」タブにて "xxx.way-point.gpx" を読み込み、一筆書きの区域を作成する。
+                    </li>
+                    <li class="margin">
+                        「ファイル出力」タブにて "xxx_PnP.geojson" または "xxx_Poly.geojson" と "xxx_Point.geojson" の組み合わせをダウンロード。
+                    </li>
+                    <li class="margin">
+                        出力済みの複数ファイルを読み込む。
+                    </li>
+                    <li class="margin">
+                        入力したファイルのメイン区画とサブ区画を決める（メインは1つだけ）。
+                    </li>
+                    <li class="margin">
+                        サブ区画ごとに、メインとの連結測点を選択する
+                    </li>
+                </ol>
+            </details>
+            <p></p>
+            
+    </div>
+    <div id="mapping_pdf_summary">
+        <h1>📊 実測図の作成</h1>
+            <hr style="margin-top: 5px; margin-bottom: 20px; border: 3px solid #dcdddd;">
+            <p class="margin">
+                GeoJSONのデータを入力し、実測原図・実測位置図を作成する為のタブです。GeoJSONのデータは、GNSSで計測した "xxx_way-point.gpx"ファイル を「メインページ」で前処理し、「ファイル出力」内の「データの保存」にてGeoJSONフォーマットのデータを出力して下さい。詳しくは「説明書」を参考にして下さい。
+            </p>
+    </div>
+    <div id="sync_summary">
+        <h1>🧭 実測結果の共有</h1>
+        <hr style="margin-top: 5px; margin-bottom: 20px; border: 3px solid #dcdddd;">
+        <p class="margin">
+            このタブではGeoJSONを入力する事で、実測結果をArcGIS Onlineにアップロードする事ができ、アップロードしたデータは、スマホアプリのFieldMapsでも見る事が出来ます。
+        </p>
+    </div>
+    <div id="upload_geoj1">
+        <p class="margin">
+            実測図を作成する為には、"xxx.geojson" のデータを入力する必要があります。どちらか一方のパターンでデータを読み込みます。
+        </p>
+        <ol>
+            <li class="margin">
+                "xxx_PnP.geojson" のファイルを入力する。
+            </li>
+            <li class="margin">
+                "xxx_Point.geojson" と "xxx_Point.geojson" の組み合わせを入力する。
+            </li>
+        </ol>
+    </div>
+    <div id="upload_geoj2">
+        <p class="margin">
+            データを結合する為には、"xxx.geojson" のデータを入力する必要があります。
+        </p>
+
+        <p class="marker">
+            ※この機能は実測図の作成と違い、ポリゴンとポイントの両方が含まれる "xxx_PnP.geojson" のデータだけに対応しています。
+        </p>
+    </div>
+</body>
