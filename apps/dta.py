@@ -659,7 +659,7 @@ class MultiDtaTools(object):
         with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             # JSON文字列をZipFileオブジェクトに書き込む
             for sentence, fp in zip(dtas, file_names):
-                zip_file.writestr(fp, sentence.encode('ANSI'))
+                zip_file.writestr(fp, sentence.encode('UTF-8'))
 
         # 圧縮されたファイルのバイト列を取得する
         compressed_file = buffer.getvalue()
