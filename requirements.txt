@@ -13,5 +13,4 @@ plotly
 streamlit-aggrid
 geojson
 simplekml
-arcgis
 pandas
