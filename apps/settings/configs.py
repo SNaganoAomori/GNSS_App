@@ -11,7 +11,7 @@ import pandas as pd
 import polars as pl
 import yaml
 
-conf_file_path = os.path.join(os.getcwd(), 'apps\settings\configs.yaml')
+conf_file_path = os.path.join(os.getcwd(), 'apps/settings/configs.yaml')
 
 global CONF_FILE
 
