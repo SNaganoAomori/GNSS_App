@@ -14,3 +14,4 @@ streamlit-aggrid
 geojson
 simplekml
 pandas
+beautifulsoup4
