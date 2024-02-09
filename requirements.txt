@@ -1,4 +1,4 @@
-https://github.com/requests/requests-kerberos.git
+https://github.com/requests/requests-kerberos.git@master
 numpy
 matplotlib
 polars
