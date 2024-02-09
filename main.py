@@ -24,7 +24,7 @@ from apps.settings.configs import WebAppConfs
 from apps.table_loader import files_to_datasets
 from apps.table_loader import show_editing_table
 from apps.table_loader import DataFrames
-from apps.sync_cloud import sync_cloud_page
+# from apps.sync_cloud import sync_cloud_page
 
 
 summary = Summary()
@@ -155,6 +155,7 @@ if __name__ == '__main__':
         
     if check_internet_connection():
         with tabs[4]:
-            sync_cloud_page()
+            pass
+            # sync_cloud_page()
 
 
