@@ -31,14 +31,14 @@ from apps.table_loader import DataFrames
 summary = Summary()
 
 # Install arcgis python api
-try:
-    import arcgis
-except ModuleNotFoundError as e:
-  subprocess.Popen([f'{sys.executable} -m pip install arcgis --no-deps requests-kerberos requests-gssapi'], shell=True)
-  # wait for subprocess to install package before running your actual code below
-  time.sleep(90)
+# try:
+#     import arcgis
+# except ModuleNotFoundError as e:
+#   subprocess.Popen([f'{sys.executable} -m pip install arcgis --no-deps requests-kerberos requests-gssapi'], shell=True)
+#   # wait for subprocess to install package before running your actual code below
+#   time.sleep(90)
 
-import arcgis
+# import arcgis
 
 
 def page_config():
