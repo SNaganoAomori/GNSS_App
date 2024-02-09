@@ -1,3 +1,4 @@
+libkrb5-dev
 gssapi
 numpy
 matplotlib
