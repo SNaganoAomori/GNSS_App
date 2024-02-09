@@ -34,7 +34,7 @@ summary = Summary()
 try:
     import arcgis
 except ModuleNotFoundError as e:
-  subprocess.Popen([f'{sys.executable} -m pip install arcgis'], shell=True)
+  subprocess.Popen([f'{sys.executable} -m pip install arcgis --no-deps requests-kerberos requests-kerberos'], shell=True)
   # wait for subprocess to install package before running your actual code below
   time.sleep(90)
 
