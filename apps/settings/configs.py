@@ -15,7 +15,7 @@ conf_file_path = os.path.join(os.getcwd(), 'apps\settings\configs.yaml')
 
 global CONF_FILE
 
-with open(conf_file_path, mode='r', encoding='utf-8') as f:
+with open(conf_file_path, mode="r", encoding='utf-8') as f:
     CONF_FILE = yaml.safe_load(f)
 
 
