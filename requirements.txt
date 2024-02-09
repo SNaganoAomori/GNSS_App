@@ -1,6 +1,5 @@
-kerberos
-krb5
-gssapi
+requests-kerberos
+requests-gssapi
 numpy
 matplotlib
 polars
