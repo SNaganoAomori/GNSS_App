@@ -1,5 +1,4 @@
-requests-kerberos
-requests-gssapi
+https://github.com/requests/requests-kerberos.git
 numpy
 matplotlib
 polars
