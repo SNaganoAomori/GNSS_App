@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import datetime
+import os
 from typing import Any
 from typing import Dict
 from typing import List
@@ -10,8 +11,7 @@ import pandas as pd
 import polars as pl
 import yaml
 
-
-conf_file_path = r'apps\settings\configs.yaml'
+conf_file_path = os.path.join(os.getcwd(), 'apps\settings\configs.yaml')
 
 global CONF_FILE
 
