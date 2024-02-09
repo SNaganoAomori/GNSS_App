@@ -1,5 +1,8 @@
 from dataclasses import asdict
 import re
+import subprocess
+import sys
+import time
 from typing import List
 
 import pandas as pd
@@ -25,9 +28,18 @@ from apps.table_loader import files_to_datasets
 from apps.table_loader import show_editing_table
 from apps.table_loader import DataFrames
 # from apps.sync_cloud import sync_cloud_page
-
-
 summary = Summary()
+
+# Install arcgis python api
+try:
+    import arcgis
+except ModuleNotFoundError as e:
+  subprocess.Popen([f'{sys.executable} -m pip install arcgis'], shell=True)
+  # wait for subprocess to install package before running your actual code below
+  time.sleep(90)
+
+import arcgis
+
 
 def page_config():
     # ページの設定
