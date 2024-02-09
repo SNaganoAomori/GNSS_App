@@ -256,6 +256,7 @@ def spatial_search(file: UploadedFile):
     if st.session_state.get('spatial_index') is None:
         fp = os.path.join(os.path.dirname(__file__), 'settings/local_area.geoparquet')
         st.markdown(fp)
+        print(fp)
         st.session_state['spatial_index'] = gpd.read_parquet(fp)
     gdf = st.session_state.get('spatial_index')
     row = gdf[point.intersects(gdf.geometry)].copy()
