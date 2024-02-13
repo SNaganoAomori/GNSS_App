@@ -659,7 +659,7 @@ class MultiDtaTools(object):
         with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             # JSON文字列をZipFileオブジェクトに書き込む
             for sentence, fp in zip(dtas, file_names):
-                zip_file.writestr(fp, sentence.encode('UTF-8'))
+                zip_file.writestr(fp, sentence.encode('cp932'))
 
         # 圧縮されたファイルのバイト列を取得する
         compressed_file = buffer.getvalue()
@@ -748,5 +748,5 @@ if __name__ == '__main__':
     sentence = write_dta_sentence(**d)
 
     outfp= r"Y:\OWLを利用した立木調査\2023_大鰐_586は1_586い5\コンパス\仮想コンパス測量成果_586結合.dta"
-    with open(outfp, mode='w', encoding='utf-8') as f:
+    with open(outfp, mode='w', encoding='cp932') as f:
         f.write(sentence)
