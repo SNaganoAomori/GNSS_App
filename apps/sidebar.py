@@ -253,12 +253,11 @@ def spatial_search(file: UploadedFile):
     mu_x = df['lon'].mean()
     mu_y = df['lat'].mean()
     point = shapely.geometry.Point(mu_x, mu_y)
-    fp = r'apps/settings/local_area.geoparquet'
     if st.session_state.get('spatial_index') is None:
+        fp = r'apps/settings/local_area.geoparquet'
         st.session_state['spatial_index'] = gpd.read_parquet(fp)
     
-    # gdf = st.session_state.get('spatial_index')
-    gdf = gpd.read_parquet(fp)
+    gdf = st.session_state.get('spatial_index')
     row = gdf[point.intersects(gdf.geometry)].copy()
     series = row.iloc[0]
     if 1 <= row.shape[0]:
@@ -266,7 +265,7 @@ def spatial_search(file: UploadedFile):
             'office': series[jn_confs.office_col], 
             'branch_office': series[jn_confs.branch_office_col], 
             'local_area': series[jn_confs.lcoal_area_col]
-        }, gdf
+        }
     else:
         return None
 
@@ -281,16 +280,13 @@ def run_sidebar():
         prepro_confs = res.get('prepro_confs')
         if files:
             try:
-                being_sought, _gdf = spatial_search(files[0])
+                being_sought = spatial_search(files[0])
             except Exception as _:
                 being_sought = None
             # 追加情報の入力
             project_confs = add_project_confs(being_sought)
             # 測量結果を閉合するか
             st.markdown("""---""")
-            st.markdown(type(_gdf))
-            st.markdown(_gdf.shape)
-
             st.markdown("## 測量結果の閉合", help='このチェックボックスを外す事で閉合しないデータを出力します。')
             expander = st.expander('設定')
             close = expander.checkbox('閉合する', True)
