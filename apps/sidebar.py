@@ -257,8 +257,7 @@ def spatial_search(file: UploadedFile):
         fp = r'apps/settings/local_area.geoparquet'
         st.session_state['spatial_index'] = gpd.read_parquet(fp)
     
-    gdf = gpd.read_parquet(fp)
-    st.markdown(type(gdf), gdf.shape)
+    gdf = st.session_state.get('spatial_index')
     row = gdf[point.intersects(gdf.geometry)].copy()
     series = row.iloc[0]
     if 1 <= row.shape[0]:
@@ -288,10 +287,8 @@ def run_sidebar():
             project_confs = add_project_confs(being_sought)
             # 測量結果を閉合するか
             st.markdown("""---""")
-            from apps.settings.configs import XlsSummaryConfs
-            st.markdown(XlsSummaryConfs().template_file)
-            st.markdown(r'apps/settings/local_area.geoparquet')
-
+            idx = st.session_state.get('spatial_index')
+            st.markdown(f"Type: {type(idx)}, Size: {idx.shape}")
             st.markdown("## 測量結果の閉合", help='このチェックボックスを外す事で閉合しないデータを出力します。')
             expander = st.expander('設定')
             close = expander.checkbox('閉合する', True)
