@@ -98,6 +98,11 @@ class Summary(object):
     def show_sign_in_summary(self):
         html = self.select_short_html('sign_in')
         st.markdown(html, unsafe_allow_html=True)
+    
+    @property
+    def show_warning_sync_cloud_summary(self):
+        html = self.select_short_html('warning_sync_cloud')
+        st.markdown(html, unsafe_allow_html=True)
 
     @property
     def show_main_page_summary(self):
