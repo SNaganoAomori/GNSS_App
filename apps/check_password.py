@@ -19,13 +19,11 @@ def check_password():
         return True
     
     summary.show_sign_in_summary
-    
+
     # Show input for password.
-    st.number_input(
+    st.text_input(
         label='パスワード',
         type='password',
-        min_value=0,
-        max_value=9999,
         on_change=password_entered, 
         key="password"
     )
