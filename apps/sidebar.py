@@ -289,6 +289,7 @@ def run_sidebar():
             st.markdown("""---""")
             idx = st.session_state.get('spatial_index')
             st.markdown(f"Type: {type(idx)}, Size: {idx}")
+            st.markdown(type(gpd.read_parquet(r'apps/settings/local_area.geoparquet')))
             st.markdown("## 測量結果の閉合", help='このチェックボックスを外す事で閉合しないデータを出力します。')
             expander = st.expander('設定')
             close = expander.checkbox('閉合する', True)
