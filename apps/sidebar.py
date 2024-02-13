@@ -258,6 +258,7 @@ def spatial_search(file: UploadedFile):
         st.session_state['spatial_index'] = gpd.read_parquet(fp)
     
     gdf = gpd.read_parquet(fp)
+    st.markdown(type(gdf), gdf.shape)
     row = gdf[point.intersects(gdf.geometry)].copy()
     series = row.iloc[0]
     if 1 <= row.shape[0]:
