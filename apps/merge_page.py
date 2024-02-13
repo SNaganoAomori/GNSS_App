@@ -192,7 +192,6 @@ def check_gdf(gdf: gpd.GeoDataFrame):
     point_gdf = select_geom_rows(gdf, False)
     confirmation_existence_points(point_gdf)
     confirmation_existence_poly(poly_gdf)
-    confirmation_existence_pnp(gdf)
 
 
 def create_geodataframes(
