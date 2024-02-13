@@ -257,7 +257,7 @@ def spatial_search(file: UploadedFile):
         fp = r'apps/settings/local_area.geoparquet'
         st.session_state['spatial_index'] = gpd.read_parquet(fp)
     
-    gdf = st.session_state.get('spatial_index')
+    gdf = gpd.read_parquet(fp)
     row = gdf[point.intersects(gdf.geometry)].copy()
     series = row.iloc[0]
     if 1 <= row.shape[0]:
@@ -290,7 +290,6 @@ def run_sidebar():
             from apps.settings.configs import XlsSummaryConfs
             st.markdown(XlsSummaryConfs().template_file)
             st.markdown(r'apps/settings/local_area.geoparquet')
-            st.markdown()
 
             st.markdown("## 測量結果の閉合", help='このチェックボックスを外す事で閉合しないデータを出力します。')
             expander = st.expander('設定')
