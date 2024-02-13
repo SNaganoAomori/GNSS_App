@@ -158,7 +158,7 @@ def run():
         
     if check_internet_connection():
         with tabs[4]:
-            summary.show_warning_sync_cloud_summary
+            _ = summary.show_warning_sync_cloud_summary
             # sync_cloud_page()
 
 
