@@ -22,13 +22,13 @@ def check_password():
 
     # Show input for password.
     st.text_input(
-        label='パスワード',
+        label='パスワードを入力して下さい。',
         type='password',
         on_change=password_entered, 
         key="password"
     )
     if "password_correct" in st.session_state:
-        st.error("😕 Password incorrect")
+        st.error("😫 パスワードが違います。")
     return False
 
 
