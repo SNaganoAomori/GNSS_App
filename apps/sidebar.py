@@ -287,7 +287,7 @@ def run_sidebar():
             project_confs = add_project_confs(being_sought)
             # 測量結果を閉合するか
             st.markdown("""---""")
-            from settings.configs import XlsSummaryConfs
+            from apps.settings.configs import XlsSummaryConfs
             st.markdown(XlsSummaryConfs().template_file)
             st.markdown(r'apps/settings/local_area.geoparquet')
             st.markdown()
