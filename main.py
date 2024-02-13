@@ -10,6 +10,7 @@ import polars as pl
 import streamlit as st
 from shapely.geometry import Point, Polygon
 
+from apps.check_password import check_password
 from apps.create_pdf import page_of_mapping_pdf
 from apps.documents import Summary
 from apps.documents import CheatSheet
@@ -27,18 +28,7 @@ from apps.settings.configs import WebAppConfs
 from apps.table_loader import files_to_datasets
 from apps.table_loader import show_editing_table
 from apps.table_loader import DataFrames
-# from apps.sync_cloud import sync_cloud_page
 summary = Summary()
-
-# Install arcgis python api
-# try:
-#     import arcgis
-# except ModuleNotFoundError as e:
-#   subprocess.Popen([f'{sys.executable} -m pip install arcgis --no-deps requests-kerberos requests-gssapi'], shell=True)
-#   # wait for subprocess to install package before running your actual code below
-#   time.sleep(90)
-
-# import arcgis
 
 
 def page_config():
@@ -89,8 +79,9 @@ def _points_to_poly(df: pl.DataFrame) -> Polygon:
 
 def get_result_table(dataframe: pl.DataFrame, poly_close: bool) -> pl.DataFrame:
     # 編集が完了したDataFrameを取得
+    drg_confs = DrgGpxConfs()
     result = (
-        dataframe.join(dataframe_sets.dataframe, on='ori_idx')
+        dataframe.join(dataframe, on='ori_idx')
         .sort(pl.col('idx'))
         .drop('ori_idx')
         .with_columns([
@@ -105,8 +96,7 @@ def get_result_table(dataframe: pl.DataFrame, poly_close: bool) -> pl.DataFrame:
     return result
 
 
-
-if __name__ == '__main__':
+def run():
     drg_confs = DrgGpxConfs()
     jn_confs = JnDataCols()
     page_config()
@@ -171,3 +161,7 @@ if __name__ == '__main__':
             # sync_cloud_page()
 
 
+
+if __name__ == '__main__':
+    if check_password():
+        run()
