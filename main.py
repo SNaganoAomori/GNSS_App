@@ -77,11 +77,11 @@ def _points_to_poly(df: pl.DataFrame) -> Polygon:
     ])
     return poly
 
-def get_result_table(dataframe: pl.DataFrame, poly_close: bool) -> pl.DataFrame:
+def get_result_table(dataframe_sets, dataframe: pl.DataFrame, poly_close: bool) -> pl.DataFrame:
     # 編集が完了したDataFrameを取得
     drg_confs = DrgGpxConfs()
     result = (
-        dataframe.join(dataframe, on='ori_idx')
+        dataframe.join(dataframe_sets.dataframe, on='ori_idx')
         .sort(pl.col('idx'))
         .drop('ori_idx')
         .with_columns([
@@ -125,7 +125,8 @@ def run():
             # 編集用テーブルの表示
             selected_rows = show_editing_table(show_df, sidebar_resps[0])
             # 編集後データの取得
-            result = get_result_table(selected_rows, sidebar_resps[0].poly_close)
+            result = get_result_table(
+                dataframe_sets, selected_rows, sidebar_resps[0].poly_close)
             # mapping.
             mapping_in_streamlit(result, sidebar_resps)
         else:
