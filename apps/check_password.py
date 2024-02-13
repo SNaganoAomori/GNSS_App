@@ -1,6 +1,8 @@
 import hmac
 import streamlit as st
 
+from apps.documents import Summary
+summary = Summary()
 
 def check_password():
     """Returns `True` if the user had the correct password."""
@@ -15,10 +17,17 @@ def check_password():
     # Return True if the password is validated.
     if st.session_state.get("password_correct", False):
         return True
-
+    
+    summary.show_sign_in_summary
+    
     # Show input for password.
-    st.text_input(
-        "Password", type="password", on_change=password_entered, key="password"
+    st.number_input(
+        label='パスワード',
+        type='password',
+        min_value=0,
+        max_value=9999,
+        on_change=password_entered, 
+        key="password"
     )
     if "password_correct" in st.session_state:
         st.error("😕 Password incorrect")

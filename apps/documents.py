@@ -95,6 +95,11 @@ class Summary(object):
         return self.soup_html.find('div', id=_id)
 
     @property
+    def show_sign_in_summary(self):
+        html = self.select_short_html('sign_in')
+        st.markdown(html, unsafe_allow_html=True)
+
+    @property
     def show_main_page_summary(self):
         html = self.select_short_html('main_page_summary')
         st.markdown(html, unsafe_allow_html=True)
