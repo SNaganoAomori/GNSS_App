@@ -254,8 +254,9 @@ def spatial_search(file: UploadedFile):
     mu_y = df['lat'].mean()
     point = shapely.geometry.Point(mu_x, mu_y)
     if st.session_state.get('spatial_index') is None:
-        fp = os.path.join(r'apps/settings/local_area.geoparquet')
+        fp = r'apps/settings/local_area.geoparquet'
         st.session_state['spatial_index'] = gpd.read_parquet(fp)
+    
     gdf = st.session_state.get('spatial_index')
     row = gdf[point.intersects(gdf.geometry)].copy()
     series = row.iloc[0]
