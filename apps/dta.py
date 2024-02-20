@@ -328,9 +328,15 @@ def write_csv_sentence(
     lons: List[float], 
     lats: List[float], 
     epsg: int,
-    closed: bool=True
+    closed: bool=True,
+    mag_corr: bool=False
 ) -> str:
     coords = azimuth_and_distance_all(lons, lats, closed, epsg)
+    if mag_corr:
+        coords.azimuth_lst = true_north_to_mag_north(
+            coords.azimuth_lst,
+            [shapely.Point(x, y) for x, y in zip(lons, lats)]
+        )
     zipper = zip(pt_names, coords.azimuth_lst, coords.distance_lst)
     sentence = ''
     for i, (name, azimuth, distance) in enumerate(zipper):

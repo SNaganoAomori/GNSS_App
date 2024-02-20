@@ -269,7 +269,8 @@ def download_dta(
             pt_names=df[jn_confs.pt_name_col].to_list(),
             lons=df[jn_confs.lon_col].to_list(),
             lats=df[jn_confs.lat_col].to_list(),
-            epsg=4326
+            epsg=4326,
+            mag_corr=mag_corr
         )
         expander.download_button(
             label=".CSV ファイルのダウンロード",
