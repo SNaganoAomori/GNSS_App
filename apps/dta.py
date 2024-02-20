@@ -3,6 +3,7 @@
 
 """
 from dataclasses import dataclass
+import datetime
 from io import BytesIO
 from typing import List
 import zipfile
@@ -11,9 +12,11 @@ import geopandas as gpd
 import pandas as pd
 import plotly.graph_objects as go
 import pyproj
+import shapely
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
+from apps.convert_coords import CoordinatesFormatter
 from apps.documents import Summary
 from apps.exception import confirmation_existence_points
 from apps.merge_page import convert_lang
@@ -23,6 +26,7 @@ from apps.merge_page import uploder
 from apps.projective_transformer import create_tramsformer
 from apps.projective_transformer import transformer_project
 from apps.settings.configs import JnDataCols
+from apps.settings.configs import mag_csv_file
 summary = Summary()
 
 
@@ -216,6 +220,36 @@ def azimuth_and_distance_all(
     relative_coords = compass.calc_azimuth_and_distance_all(lons, lats, closed)
     return relative_coords
 
+def true_north_to_mag_north(
+    azimuth_lst: List[float], 
+    points: List[shapely.Point]
+) -> List[float]:
+    # UTMに投影変換
+    point_gdf = gpd.GeoDataFrame(geometry=points, crs='EPSG:4326')
+    point_gdf_utm = point_gdf.to_crs(point_gdf.estimate_utm_crs())
+    # 偏角のファイルを読み込む
+    mag_df = pd.read_csv(mag_csv_file)
+    mag_points = gpd.points_from_xy(mag_df['lon'], mag_df['lat'])
+    mag_gdf = gpd.GeoDataFrame(mag_df, geometry=mag_points, crs='EPSG:4326')
+    mag_gdf_utm = mag_gdf.to_crs(point_gdf_utm.crs)
+    delta_lst = []
+    for point in point_gdf_utm.geometry:
+        mag_gdf_utm['distance'] = mag_gdf_utm.distance(point)
+        mag_gdf_utm = mag_gdf_utm.sort_values('distance').copy()
+        dms =  mag_gdf_utm.iloc[0]['delta']
+        cf = CoordinatesFormatter(dms)
+        now = datetime.datetime.now()
+        delta = cf.degree + 0.05 * (now.year - 2020)
+        delta_lst.append(delta)
+    new_azimuth_lst = []
+    for azimuth, delta_lst in zip(azimuth_lst, delta_lst):
+        azimuth -= delta
+        if azimuth < 0:
+            new_azimuth_lst.append(azimuth + 360)
+        else:
+            new_azimuth_lst.append(azimuth)
+    return [round(azimuth, 1) for azimuth in new_azimuth_lst]
+
 
 def single_dta_sentence(
     pt_names: List[str | float],
@@ -239,46 +273,6 @@ def single_dta_sentence(
     return header
 
 
-def multiple_dta_sentence(
-    pt_names: List[str | float],
-    azimuth_lst: List[float],
-    distance_lst: List[float],
-    main_conns: List[str | float],
-    conn_azimuth_lst: List[float],
-    conn_distance_lst: List[float],
-    sub_conns: List[str | float],
-    sub_file_paths: List[str],
-) -> str:
-    """
-    区画が複数あるDTAファイルに書き込む文字列の作成
-    Args:
-        pt_names(List[str | float]): 測点名
-        azimuth_lst(List[float]): 方位角（真北）
-        distance_lst(List[float]): 水平距離
-        main_conns(List[str | float]): 従属区画と接続するmain区画の測点名
-        azimuth_lst(List[float]): 従属区画と接続するmain区画の測点からの方位角
-        distance_lst(List[float]): 従属区画と接続するmain区画の測点からの水平距離
-        sub_conns(List[str | float]): main区画と接続する従属区画の測点名
-        sub_file_paths(List[str]): 従属区画のファイル名
-    Returns:
-        str: DTAファイルの文字列、このまま書き込み出来る
-    """
-    indent = ' ' * 297
-    header = ' 0  0  0  0\n'
-    for i, (name, azimuth, distance) in \
-            enumerate(zip(pt_names, azimuth_lst, distance_lst)):
-        # Indexの作成 [' 1(D-1.0)', ' 2(D-2.0)', ...]
-        idx = f"{i + 1}({name})"
-        sentence = f" {idx}  {azimuth}  0  {distance}"
-        if name in main_conns:
-            i = main_conns.index(name)
-            # 従属ファイルまでの方位角と距離を入力
-            sentence += f'  {conn_azimuth_lst[i]}  0  {conn_distance_lst[i]}'
-            sentence += f"{indent}{sub_conns[i]}  {sub_file_paths[i]}"
-        sentence += '\n'
-        header += sentence
-    return header
-
 
 def write_dta_sentence(
     pt_names: List[str | float],
@@ -286,12 +280,7 @@ def write_dta_sentence(
     lats: List[float], 
     epsg: int,
     closed: bool=True,
-    main_conns: List[str | float]=None,
-    sub_conns: List[str | float]=None,
-    sub_lons: List[float]=None,
-    sub_lats: List[float]=None,
-    sub_file_paths: List[str]=None,
-    sub_epsg: int=None
+    mag_corr: bool=False
 ) -> str:
     """
     DTAファイルに書き込む文字列の作成。単一区画でも複数でも可。複数の場合は全て
@@ -302,12 +291,6 @@ def write_dta_sentence(
         lats(List[float]): 緯度のリスト
         epsg(int): main区画のEPSGコード
         closed(bool): 閉合するか、Trueの場合は0番目の経緯度を最後にも追加する
-        main_conns(List[str | float]): 従属区画と接続するmain区画の測点名
-        sub_conns(List[str | float]): main区画と接続する従属区画の測点名
-        sub_lons(List[float]): main区画と接続する従属区画測点の経度のリスト
-        sub_lats(List[float]): main区画と接続する従属区画測点の緯度のリスト
-        sub_file_paths(List[str]): 従属区画のファイル名
-        sub_epsg(int): 従属区画のEPSGコード
     Returns:
         str: DTAファイルの文字列、このまま書き込み出来る
     """
@@ -326,58 +309,17 @@ def write_dta_sentence(
     
     # メイン区画の方位角と水平距離を計算
     relative_coords = azimuth_and_distance_all(lons, lats, closed, 4326)
-    # 複数の区画を結合するならば　
-    if not main_conns is None:
-        if sub_epsg != 4326:
-            # 結合先座標の投影変換
-            coords = (
-                transformer_project(
-                    lon=sub_lons, 
-                    lat=sub_lats, 
-                    in_epsg=sub_epsg,
-                    out_epsg=4326
-                )
-            )
-            sub_lons = coords.lons
-            sub_lats = coords.lats
-        # メイン区画経緯度から結合区画測点の経緯度までの相対座標を計算
-        conn_azimuth_lst = []
-        conn_distance_lst = []
-        for m_name, s_lon, s_lat in zip(main_conns, sub_lons, sub_lats):
-            # 従属測点と結合するメイン区画の座標を取得
-            m_idx = pt_names.index(m_name)
-            m_lon = lons[m_idx]
-            m_lat = lats[m_idx]
-            # メイン区画測点から従属区画測点までの方位角と水平距離を計算
-            _relative = (
-                azimuth_and_distance(
-                    behind_lon=m_lon,
-                    behind_lat=m_lat,
-                    forward_lon=s_lon,
-                    forward_lat=s_lat,
-                    epsg=4326
-                )
-            )
-            conn_azimuth_lst.append(_relative.azimuth)
-            conn_distance_lst.append(_relative.distance)
-        # DTAセンテンスの作成（複数区画）
-        sentence = multiple_dta_sentence(
-            pt_names=pt_names,
-            azimuth_lst=relative_coords.azimuth_lst,
-            distance_lst=relative_coords.distance_lst,
-            main_conns=main_conns,
-            conn_azimuth_lst=conn_azimuth_lst,
-            conn_distance_lst=conn_distance_lst,
-            sub_conns=sub_conns,
-            sub_file_paths=sub_file_paths
+    if mag_corr:
+        mag_azimuth_lst = true_north_to_mag_north(
+            relative_coords.azimuth_lst, 
+            points=[shapely.Point(x, y) for x, y in zip(lons, lats)]
         )
-    else:
-        # DTAセンテンスの作成（単独区画）
-        sentence = single_dta_sentence(
-            pt_names=pt_names,
-            azimuth_lst=relative_coords.azimuth_lst,
-            distance_lst=relative_coords.distance_lst
-        )
+        relative_coords.azimuth_lst = mag_azimuth_lst
+    sentence = single_dta_sentence(
+        pt_names=pt_names,
+        azimuth_lst=relative_coords.azimuth_lst,
+        distance_lst=relative_coords.distance_lst
+    )
     return sentence
 
 
@@ -604,7 +546,7 @@ class MultiDtaTools(object):
         self,
         main_data: CombinationSettings,
         datasets: List[CombinationSettings],
-        coords_sets: MultiDtaCoords,
+        coords_sets: MultiDtaCoords
     ):
         conn_main_pt_names = []
         conn_sub_pt_names = []
@@ -675,7 +617,31 @@ class MultiDtaTools(object):
         )
 
 
-        
+def multi_file_to_magnetic_correction(
+    coords: MultiDtaCoords, 
+    gdfs: List[gpd.GeoDataFrame]
+) -> MultiDtaCoords:
+    """複数ファイルの真北から磁北への変換"""
+    base = shapely.MultiPoint(pd.concat(gdfs).geometry.to_list()).centroid
+    coords.main_coords.azimuth_lst = true_north_to_mag_north(
+        coords.main_coords.azimuth_lst,
+        points=[base for _ in range(len(coords.main_coords.azimuth_lst))]
+    )
+    sub_coords = []
+    for coord in coords.sub_coords:
+        coord.azimuth_lst = true_north_to_mag_north(
+            coord.azimuth_lst,
+            points=[base for _ in range(len(coord.azimuth_lst))]
+        )
+        sub_coords.append(coord)
+    conn_coords = []
+    for coord in coords.conn_coords:
+        coord.azimuth = true_north_to_mag_north([coord.azimuth], [base])[0]
+        conn_coords.append(coord)
+    return MultiDtaCoords(coords.main_coords, sub_coords, conn_coords)
+    
+
+    
 
 def merge_page_dta():
     """GeoJSONファイルを結合してDTAファイルが入った圧縮フォルダを作成するページ"""
@@ -709,44 +675,13 @@ def merge_page_dta():
         st.markdown('<br>', True)
         st.markdown('### 圧縮ファイルのダウンロード')
         st.markdown('<hr style="margin: 0px; border: 3px solid #008899">', True)
+        sentence = "国土地理院で公開されている2020年時点での地域ごとの偏角一覧を使用。  "
+        sentence += "https://www.gsi.go.jp/buturisokuchi/menu03_magnetic_chart.html"
+        mag_corr = st.toggle('磁北への変換 ', help=sentence)
         calc = st.toggle('計算させる')
         if calc:
             coords = dta_tools.multi_azimuth_and_distance(datasets, main_data)
+            if mag_corr:
+                coords = multi_file_to_magnetic_correction(coords, gdfs)
             dtas , file_names = dta_tools.write_dta_sentence(main_data, datasets, coords)
             dta_tools.download_zipfile(dtas, file_names)
-
-
-
-if __name__ == '__main__':
-    import geopandas as gpd
-    # outer = gpd.read_file(r"D:\マイドライブ\DEL\test_multiple_jsons\OuterPoly.geojson")
-    # island = gpd.read_file(r"D:\マイドライブ\DEL\test_multiple_jsons\Island.geojson")
-    # d = dict(
-    #     pt_names=outer['測点名'].to_list(),
-    #     lons=outer.geometry.x.to_list(),
-    #     lats=outer.geometry.y.to_list(),
-    #     epsg=6678,
-    #     main_conns=['4.0',],
-    #     sub_conns=['D-5.0', ],
-    #     sub_lons=[39765.294807053214754,],
-    #     sub_lats=[126928.37512831465574, ],
-    #     sub_file_paths=['island.dta', ],
-    #     sub_epsg=6678
-    # )
-    # sentence = write_dta_sentence(**d)
-    gdf = gpd.read_file(r"Y:\OWLを利用した立木調査\geometries.gpkg", layer='対象地')
-    xs, ys = [], []
-    for coords in gdf.geometry[3].__geo_interface__.get('coordinates')[0][0]:
-        xs.append(coords[0])
-        ys.append(coords[1])
-    d = dict(
-        pt_names=[i + 1 for i in  range(len(xs))],
-        lons=xs,
-        lats=ys,
-        epsg=6678
-    )   
-    sentence = write_dta_sentence(**d)
-
-    outfp= r"Y:\OWLを利用した立木調査\2023_大鰐_586は1_586い5\コンパス\仮想コンパス測量成果_586結合.dta"
-    with open(outfp, mode='w', encoding='cp932') as f:
-        f.write(sentence)

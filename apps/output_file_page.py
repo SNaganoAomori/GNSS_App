@@ -246,13 +246,17 @@ def download_dta(
     """
     jn_confs = JnDataCols()
     expander = summary.show_download_dta_summary
+    sentence = "国土地理院で公開されている2020年時点での地域ごとの偏角一覧を使用。  "
+    sentence += "https://www.gsi.go.jp/buturisokuchi/menu03_magnetic_chart.html"
+    mag_corr = expander.toggle('磁北への変換', help=sentence)
     if expander.toggle('ONにするとDTAファイルが作成されダウンロード可能になります'):
         # 座標データからコンパス測量の成果を求め、DTAファイルと同じフォーマットの文字列を作成する        
         dta_sentence = write_dta_sentence(
             pt_names=df[jn_confs.pt_name_col].to_list(),
             lons=df[jn_confs.lon_col].to_list(),
             lats=df[jn_confs.lat_col].to_list(),
-            epsg=4326
+            epsg=4326,
+            mag_corr=mag_corr
         )
         expander.download_button(
             label=".DTA ファイルのダウンロード",
@@ -491,5 +495,5 @@ def output_page(df: pl.DataFrame, sidebar_resps: SideBarResponse):
         )
 
 
-    
-    
+
+

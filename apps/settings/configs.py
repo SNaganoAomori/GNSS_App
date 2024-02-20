@@ -583,6 +583,7 @@ def check_lang_jn_in_df(df: [pl.DataFrame | pd.DataFrame]) -> bool:
         return False
     
 
+mag_csv_file = r'apps/settings/mag.csv'
 
 
 if __name__ == '__main__':
