@@ -327,6 +327,32 @@ def properties_pt2poly(df: pl.DataFrame | gpd.GeoDataFrame) -> Dict[str, Any]:
     return properties
 
 
+
+def point_converter(point: shapely.Point) -> geojson.Point:
+    if point is None:
+        return None
+    coords = point.__geo_interface__.get('coordinates')
+    return geojson.Point(coords, precision=9)
+
+def linestring_converter(line: shapely.LineString) -> geojson.LineString:
+    if line is None:
+        return None
+    coords = line.__geo_interface__.get('coordinates')
+    return geojson.LineString(coords, precision=9)
+
+def poly_converter(poly: shapely.Polygon) -> geojson.Polygon:
+    if poly is None:
+        return None
+    coords = poly.__geo_interface__.get('coordinates')
+    return geojson.Polygon(coords, precision=9)
+
+def multi_poly_converter(multi_poly: shapely.MultiPolygon) -> geojson.MultiPolygon:
+    if multi_poly is None:
+        return None
+    coords = multi_poly.__geo_interface__.get('coordinates')
+    return geojson.MultiPolygon(coords, precision=9)
+
+
 @dataclass
 class GeoJsons:
     pnp_geojson: str = None
@@ -352,8 +378,9 @@ class GeoJ(JnDataCols):
         start = self.df[self.start_datetime_col].min()
         end = self.df[self.datetime_col].max()
         properties['work_time'] = self._timedelta_to_str(end - start)
+        poly = poly_converter(self.geometries.poly)
         feats = geojson.Feature(
-            geometry=self.geometries.poly, properties=properties)
+            geometry=poly, properties=properties)
         return feats
         
     @property
@@ -366,7 +393,11 @@ class GeoJ(JnDataCols):
             properties_lst.append(row)
         features = []
         for i, point in enumerate(self.geometries.points):
-            feat = geojson.Feature(geometry=point, properties=properties_lst[i])
+            feat = geojson.Feature(
+                geometry=point_converter(point), 
+                properties=properties_lst[i],
+            )
+            geojson.Feature()
             features.append(feat)
         return features
     
@@ -379,8 +410,8 @@ class GeoJ(JnDataCols):
         start = self.df[self.start_datetime_col].min()
         end = self.df[self.datetime_col].max()
         properties['work_time'] = self._timedelta_to_str(end - start)
-        feats = geojson.Feature(
-            geometry=self.geometries.line, properties=properties)
+        line = linestring_converter(self.geometries.line)
+        feats = geojson.Feature(geometry=line, properties=properties)
         return feats
         
     def collections(self, poly: bool) -> GeoJsons:
@@ -662,9 +693,4 @@ def edit_multipoly_kml(gdf: gpd.GeoDataFrame) -> str:
     return kml.kml()
 
 
-if __name__ == '__main__':
-    import rich
-    df = pl.read_csv(r'./yokohama.csv')
-    geometries = edit_single_geom_datasets(df, out_epsg=3857, positioning_correction=True)
-    edit = edit_poly_kml(df, geometries)
-    a = 10
+
