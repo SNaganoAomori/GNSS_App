@@ -414,7 +414,9 @@ def output_page(df: pl.DataFrame, sidebar_resps: SideBarResponse):
                 )
                 if 'positioning_correction' not in st.session_state:
                     st.session_state['positioning_correction'] = True
-                    st.success("""補正が終わりました""", icon='😀')
+                    sentence = '補正が終わりました。  '
+                    sentence += '※上でまだ注意が出ていますが気にしないでください。'
+                    st.success(sentence, icon='😀')
                     placeholder.empty()
                 del correction
         else:
