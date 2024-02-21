@@ -82,7 +82,7 @@ def correction_coords(df: pl.DataFrame, epsg: int) -> pl.DataFrame:
     jn_confs = JnDataCols()
     lons = df[jn_confs.lon_col].to_list()
     lats = df[jn_confs.lat_col].to_list()
-    years = df[jn_confs.datetime_col].dt.year().to_list()
+    datetimes = df[jn_confs.datetime_col].to_list()
 
     # セミダイナミック補正の実行とProgressBarの表示
     txt = 'セミダイナミック補正を実行しています。しばらくお待ち下さい。'
@@ -91,8 +91,8 @@ def correction_coords(df: pl.DataFrame, epsg: int) -> pl.DataFrame:
     progress = 0
     cd_lons = []
     cd_lats = []
-    for lon, lat, year in zip(lons, lats, years):
-        coords = semidynamic_exe(lon, lat, year)
+    for lon, lat, date_time in zip(lons, lats, datetimes):
+        coords = semidynamic_exe(lon, lat, date_time)
         cd_lons.append(coords.lon)
         cd_lats.append(coords.lat)
         progress += step
@@ -269,8 +269,7 @@ def download_dta(
             pt_names=df[jn_confs.pt_name_col].to_list(),
             lons=df[jn_confs.lon_col].to_list(),
             lats=df[jn_confs.lat_col].to_list(),
-            epsg=4326,
-            mag_corr=mag_corr
+            epsg=4326
         )
         expander.download_button(
             label=".CSV ファイルのダウンロード",
@@ -496,5 +495,5 @@ def output_page(df: pl.DataFrame, sidebar_resps: SideBarResponse):
         )
 
 
-
-
+    
+    

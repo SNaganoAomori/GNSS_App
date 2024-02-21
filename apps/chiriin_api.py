@@ -18,11 +18,19 @@ Example:
     >>> NewCoords(lon=140.087850903, lat=36.103776483, alti=24.9)
 
 """
+import datetime
 from dataclasses import dataclass
 import requests
 import time
 
 import numpy as np
+
+def params_year(date_time: datetime.datetime):
+    year = date_time.year
+    if date_time.month <= 3:
+        return year - 1
+    else:
+        return year
 
 
 
@@ -68,16 +76,17 @@ class SemiDynamicCorrection(object):
         self.PLACE = 0
         self.HOSEI_J = 2
 
-    def get_param_file_name(self, input_data_year):
+    def get_param_file_name(self, input_data_datetime: datetime.datetime):
         """セミダイナミック補正のパラメータファイル名を取得
         https://www.gsi.go.jp/sokuchikijun/semidyna_download.html
         """
-        return f"SemiDyna{input_data_year}.par"
+        year = params_year(input_data_datetime)
+        return f"SemiDyna{year}.par"
     
-    def get_original_coordinate_json(self, lon, lat, input_data_year):
+    def get_original_coordinate_json(self, lon, lat, date_time):
         url = self.URL
         url += f'outputType=json&'
-        url += f'chiiki={self.get_param_file_name(input_data_year)}&'
+        url += f'chiiki={self.get_param_file_name(date_time)}&'
         url += f'sokuchi={self.SOKUCHI}&'
         url += f'Place={self.PLACE}&'
         url += f'Hosei_J={self.HOSEI_J}&'
@@ -93,14 +102,14 @@ class NewCoor:
     lat: float
 
 
-def semidynamic_exe(lon, lat, input_data_year) -> NewCoor:
+def semidynamic_exe(lon, lat, date_time) -> NewCoor:
     """
     国土地理院の用意しているAPIでセミダイナミック補正を行い \n
     経緯度を今期から元期に変換します
     Args:
         lon(float): 経度.
         lat(float): 緯度.
-        input_data_year(int): 測量時の年度(yyyy/4/1 ~ yyyy+1/3/31)
+        date_time(datetime.datetime): 測量時の日時
     Returns:
         NewCoor(dataclass):
             lon(float): 補正後の経度
@@ -121,7 +130,7 @@ def semidynamic_exe(lon, lat, input_data_year) -> NewCoor:
     semidyna = SemiDynamicCorrection()
     roop = True
     while roop:
-        resps = semidyna.get_original_coordinate_json(lon, lat, input_data_year)
+        resps = semidyna.get_original_coordinate_json(lon, lat, date_time)
         if resps.get('ErrMsg') == None:
             data = resps.get('OutputData')
             new_lon = float(data.get('longitude'))
@@ -143,10 +152,3 @@ def semidynamic_exe(lon, lat, input_data_year) -> NewCoor:
 
 
 
-
-
-
-if __name__ == '__main__':
-    lat = 41.142745499
-    lon = 141.307135647
-    semidynamic_exe(lon, lat, 2023)
