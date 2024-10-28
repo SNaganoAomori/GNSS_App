@@ -137,7 +137,10 @@ def read_drggpx_useing(fp: str) -> List[Dict[str, Any]]:
         # 名称変更
         renamed = dict()
         for ori_key, ori_val in item.items():
-            renamed[rename_dict[ori_key]] = ori_val
+            if ori_key in rename_dict:
+                renamed[rename_dict[ori_key]] = ori_val
+            else:
+                print(f"Key is not found: {ori_key}. Must be newly registered.")
         # 地殻変動補正されているかの確認
         coord_genaration = renamed.get(confs.coordinate_generation_col)
         projective_technique = renamed.get(confs.projective_col)
