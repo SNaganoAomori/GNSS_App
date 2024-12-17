@@ -21,21 +21,21 @@ def visualize_data(df: pl.DataFrame, time_series: bool=False) -> go.Figure:
         fig.add_trace(
             go.Scatter(
                 x=df[jn_confs.datetime_col], y=df[jn_confs.epochs_col],
-                mode='markers'
+                mode='markers+lines'
             ), row=1, col=1
         )
         #------------------ pdop ------------------#
         fig.add_trace(
             go.Scatter(
                 x=df[jn_confs.datetime_col], y=df[jn_confs.pdop_col],
-                mode='markers'
+                mode='markers+lines'
             ), row=1, col=2
         )
         #------------------ n-satellites ------------------#
         fig.add_trace(
             go.Scatter(
                 x=df[jn_confs.datetime_col], y=df[jn_confs.satellites_col],
-                mode='markers'
+                mode='markers+lines'
             ), row=2, col=1
         )
         #------------------ holizontal std ------------------#
