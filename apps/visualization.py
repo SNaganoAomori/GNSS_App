@@ -16,26 +16,34 @@ def visualize_data(df: pl.DataFrame, time_series: bool=False) -> go.Figure:
         vertical_spacing=0.4
     )
     if time_series:
-        df = (
-            df
-            .with_columns([
-                pl.int_range(0, pl.len()).alias('index')
-            ])
-        )
         #------------------ epochs ------------------#
-        use_data = {
-            jn_confs.epochs_col: {'row': 1, 'col': 1},
-            jn_confs.pdop_col: {'row': 1, 'col': 2},
-            jn_confs.satellites_col: : {'row': 2, 'col': 1},
-            jn_confs.hstd_col: {'row': 2, 'col': 2}
-        }
-        # for col, data in use_data.items():
-        #     fig.add_trace(
-        #         go.Scatter(
-        #             x=df[jn_confs.datetime_col], y=df[col],
-        #             mode='markers'
-        #         ), **data
-        #     )
+        fig.add_trace(
+            go.Scatter(
+                x=df[jn_confs.datetime_col], y=df[jn_confs.epochs_col],
+                mode='markers'
+            ), row=1, col=1
+        )
+        #------------------ pdop ------------------#
+        fig.add_trace(
+            go.Scatter(
+                x=df[jn_confs.datetime_col], y=df[jn_confs.pdop_col],
+                mode='markers'
+            ), row=1, col=2
+        )
+        #------------------ n-satellites ------------------#
+        fig.add_trace(
+            go.Scatter(
+                x=df[jn_confs.datetime_col], y=df[jn_confs.satellites_col],
+                mode='markers'
+            ), row=2, col=1
+        )
+        #------------------ holizontal std ------------------#
+        fig.add_trace(
+            go.Scatter(
+                x=df[jn_confs.datetime_col], y=df[jn_confs.hstd_col],
+                mode='markers'
+            ), row=2, col=2
+        )
             
     else:
         #------------------ epochs ------------------#
