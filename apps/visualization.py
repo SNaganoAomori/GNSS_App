@@ -44,6 +44,18 @@ def visualize_data(df: pl.DataFrame, time_series: bool=False) -> go.Figure:
                 mode='markers'
             ), row=2, col=2
         )
+        df = (
+            df
+            .with_columns([
+                pl.int_range(0, pl.len()).alias('index')
+            ])
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=df['index'], y=df[jn_confs.hstd_col],
+                mode='lines'
+            ), row=2, col=2
+        )
             
     else:
         #------------------ epochs ------------------#
