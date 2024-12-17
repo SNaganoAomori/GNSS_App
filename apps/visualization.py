@@ -29,19 +29,13 @@ def visualize_data(df: pl.DataFrame, time_series: bool=False) -> go.Figure:
             jn_confs.satellites_col: : {'row': 2, 'col': 1},
             jn_confs.hstd_col: {'row': 2, 'col': 2}
         }
-        for col, data in use_data.items():
-            fig.add_trace(
-                go.Scatter(
-                    x=df[jn_confs.datetime_col], y=df[col],
-                    mode='markers'
-                ), **data
-            )
-            fig.add_trace(
-                go.Scatter(
-                    x=df['index'], y=df[col],
-                    mode='lines'
-                ), **data
-            )
+        # for col, data in use_data.items():
+        #     fig.add_trace(
+        #         go.Scatter(
+        #             x=df[jn_confs.datetime_col], y=df[col],
+        #             mode='markers'
+        #         ), **data
+        #     )
             
     else:
         #------------------ epochs ------------------#
