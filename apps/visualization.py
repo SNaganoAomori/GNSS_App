@@ -16,6 +16,7 @@ def visualize_data(df: pl.DataFrame, time_series: bool=False) -> go.Figure:
         vertical_spacing=0.4
     )
     if time_series:
+        df = df.sort(jn_confs.datetime_col)
         #------------------ epochs ------------------#
         fig.add_trace(
             go.Scatter(
@@ -41,19 +42,7 @@ def visualize_data(df: pl.DataFrame, time_series: bool=False) -> go.Figure:
         fig.add_trace(
             go.Scatter(
                 x=df[jn_confs.datetime_col], y=df[jn_confs.hstd_col],
-                mode='markers'
-            ), row=2, col=2
-        )
-        df = (
-            df
-            .with_columns([
-                pl.int_range(0, pl.len()).alias('index')
-            ])
-        )
-        fig.add_trace(
-            go.Scatter(
-                x=df['index'], y=df[jn_confs.hstd_col],
-                mode='lines'
+                mode='markers+lines'
             ), row=2, col=2
         )
             
