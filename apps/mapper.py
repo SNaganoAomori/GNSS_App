@@ -2,17 +2,65 @@ from typing import Any
 from typing import Dict
 from typing import List
 
+import folium
+from folium.plugins import BeautifyIcon
+import geopandas as gpd
 import pandas as pd
 import plotly.graph_objects as go
 import polars as pl
 import streamlit as st
+from streamlit_folium import st_folium
+import shapely
 
 from apps.geometries import edit_single_geom_datasets
 from apps.sidebar import SideBarResponse
 from apps.visualization import visualize_data
 from apps.settings.configs import check_lang_jn_in_df
-from apps.settings.configs import rename_en_to_jn_in_df
 from apps.settings.configs import JnDataCols
+from apps.settings.configs import rename_en_to_jn_in_df
+from apps.settings.configs import Tiles
+
+
+class Tiles:
+    @staticmethod
+    def google_satellites():
+        return dict(
+            url='https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+            name='衛星画像（Google）',
+            fmt='image/png',
+            layers='Satellite',
+            attr=u'Google',
+        )
+    
+    @staticmethod
+    def chiriin_aerial_imagery():
+        return dict(
+            url='https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
+            name='航空写真（国土地理院）',
+            fmt='image/jpeg',
+            layers='Satellite',
+            attr=u'国土地理院',
+        )
+    
+    @staticmethod
+    def chiriin_base_map():
+        return dict(
+            url='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+            name='標準地図（国土地理院）',
+            fmt='image/png',
+            layers='Map',
+            attr=u'国土地理院',
+        )
+    
+    @staticmethod
+    def esri_world_imagery():
+        return dict(
+            url='https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/WMTS/tile/1.0.0/World_Imagery/default/default028mm/{z}/{y}/{x}.jpg',
+            name='衛星画像（Esri）',
+            fmt='image/jpeg',
+            layers='Satellite',
+            attr=u'Esri',
+        )
 
 
 
@@ -261,6 +309,135 @@ def create_single_poly_figure(
     return fig
 
 
+def write_html(feature: Dict[str, Any]) -> str:
+    confs = JnDataCols()
+    properties = feature['properties']
+    data = {
+        confs.datetime_col: properties[confs.datetime_col],
+        confs.pt_name_col: properties[confs.pt_name_col],
+        confs.epochs_col: properties[confs.epochs_col],
+        confs.pdop_col: properties[confs.pdop_col],
+        confs.satellites_col: properties[confs.satellites_col],
+        confs.signal_frec_col: properties[confs.signal_frec_col],
+    }
+    _df = (
+        pd
+        .DataFrame
+        .from_dict(data, orient='index')
+    )
+    _df.columns = ['']
+    table = _df.to_html(classes="table table-striped", border=2)
+    html_style = """
+    <style>
+        .table {
+            font-size: 10px;
+        }
+    </style>
+    """
+    return html_style + table
+
+def create_map(df: pl.DataFrame, closed: bool=True):
+    confs = JnDataCols()
+    mapper = Mapping()
+    df = df.to_pandas()
+    df['測定開始日時'] = df['測定開始日時'].dt.strftime("%Y/%m/%d %H:%M:%S")
+    df['測定終了日時'] = df['測定終了日時'].dt.strftime("%Y/%m/%d %H:%M:%S")
+    gdf = gpd.GeoDataFrame(
+        df, 
+        geometry=gpd.points_from_xy(df[confs.lon_col], df[confs.lat_col]),
+        crs="EPSG:4326"
+    )
+    m = folium.Map(
+        location=[gdf.geometry.y.mean(), gdf.geometry.x.mean()], 
+        zoom_start=17,
+        max_zoom=25,
+        min_zoom=5,
+        tiles="OpenStreetMap"
+    )
+    # 標準地図の追加
+    folium.WmsTileLayer(
+        transparent=True,
+        overlay=False,
+        control=True,
+        maxNativeZoom=18,  # Set the maximum native zoom level
+        maxZoom=25, # Set the maximum zoom level
+        **Tiles.chiriin_base_map()
+    ).add_to(m)
+    # Googleの衛星画像を追加
+    folium.WmsTileLayer(
+        transparent=True,
+        overlay=False,
+        control=True,
+        maxNativeZoom=18,  # Set the maximum native zoom level
+        maxZoom=25, # Set the maximum zoom level
+        **Tiles.google_satellites()
+    ).add_to(m)
+    # Esri World Imageryの追加
+    folium.WmsTileLayer(
+        overlay=False,
+        control=True,
+        maxNativeZoom=18,  # Set the maximum native zoom level
+        maxZoom=25, # Set the maximum zoom level
+        **Tiles.esri_world_imagery()
+    ).add_to(m)
+    # 国土地理院の航空写真を追加
+    folium.WmsTileLayer(
+        transparent=True,
+        overlay=False,
+        control=True,
+        maxNativeZoom=18,  # Set the maximum native zoom level
+        maxZoom=25, # Set the maximum zoom level
+        **Tiles.chiriin_aerial_imagery()
+    ).add_to(m)
+    
+    icon_circle = BeautifyIcon(
+        icon="plane", border_color="#b3334f", text_color="#b3334f", icon_shape="triangle"
+    )
+    poly_cds = [[geom.y, geom.x] for geom in gdf['geometry']]
+    poly_cds += [poly_cds[0]]
+    folium.Polygon(
+        locations=poly_cds,
+        color="red",
+        weight=3,
+    ).add_to(m)
+
+    # 測点をマップに追加
+    labels = mapper.create_display_label(gdf[confs.pt_name_col].to_list())
+    geojson = gdf.to_geo_dict()
+    for feature, label in zip(geojson['features'], labels):
+        icon_circle = folium.plugins.BeautifyIcon(
+            icon="regular:circle", 
+            border_color="none", 
+            text_color="red", 
+            background_color='none', 
+            icon_shape="circle",
+            icon_size=[15, 15],
+            icon_anchor=[7.5, 7.5],
+        )
+        table = write_html(feature)
+        popup = folium.Popup(table, max_width=1000)
+        # 測点マーカーとラベルの追加
+        coords = feature['geometry']['coordinates'][::-1]
+        if label is None:
+            label = ""
+        folium.Marker(
+            location=coords,
+            icon=icon_circle
+        ).add_to(m)
+        folium.map.Marker(
+            location=coords,
+            popup=popup,
+            icon=folium.DivIcon(
+                html=f'<div style="white-space: nowrap; font-size: 12px; color: black; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;">{label}</div>'
+            )
+        ).add_to(m)
+
+    folium.LayerControl().add_to(m)
+    return m
+
+
+            
+
 def mapping_in_streamlit(
     df: pl.DataFrame,
     sidebar_resps_list: List[SideBarResponse]
@@ -274,16 +451,29 @@ def mapping_in_streamlit(
     report = mapping.create_report(df, sidebar_resps_list[0])
     repo_expander.data_editor(report, hide_index=True, disabled=True, )
     # Mapping
+    container = st.container()
+    map_list = [
+        'ノーマル',
+        '地図に投影',
+    ]
+    radio = container.radio('表示するデータ', map_list, horizontal=True)
     closed = sidebar_resps_list[0].poly_close
-    if len(sidebar_resps_list) == 1:
-        # データが1つの場合のMapping.
-        fig = create_single_poly_figure(df, closed)
-        st.plotly_chart(fig, config=mapping.plotly_item_confs)
-    elif 1 < len(sidebar_resps_list):
-        # データが複数の場合のMapping.
-        fig = create_multiple_file_single_poly_figure(df, closed)
-        st.plotly_chart(fig, config=mapping.plotly_item_confs)
-        
+    if radio == map_list[0]:
+        # ノーマルのMapping
+        if len(sidebar_resps_list) == 1:
+            # データが1つの場合のMapping.
+            fig = create_single_poly_figure(df, closed)
+            st.plotly_chart(fig, config=mapping.plotly_item_confs)
+
+        elif 1 < len(sidebar_resps_list):
+            # データが複数の場合のMapping.
+            fig = create_multiple_file_single_poly_figure(df, closed)
+            st.plotly_chart(fig, config=mapping.plotly_item_confs)
+    else:
+        # 地図上に投影
+        m = create_map(df, closed)
+        st_data = st_folium(m, width=1300)
+            
     time_series = st.toggle('時系列で表示')
     fig = visualize_data(df, time_series)
     st.plotly_chart(fig, config= {'staticPlot': True})

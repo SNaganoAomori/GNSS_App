@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "debug_streamlit",
+            "type": "python",
+            "request": "launch",
+            "program": "F:\\Nagano\\Manba\\envs\\gnss_web_app\\Scripts\\streamlit.exe",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "run",
+                "main.py",
+                "--server.port",
+                "5678",
+                "--server.enableStaticServing",
+                "true"
+            ]
+        }
+    ]
+}

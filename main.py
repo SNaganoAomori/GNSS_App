@@ -164,5 +164,5 @@ def run():
 
 
 if __name__ == '__main__':
-    if check_password():
-        run()
+    # if check_password():
+    run()

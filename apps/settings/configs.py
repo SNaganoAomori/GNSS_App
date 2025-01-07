@@ -583,6 +583,45 @@ def check_lang_jn_in_df(df: [pl.DataFrame | pd.DataFrame]) -> bool:
         return False
     
 
+
+
+class Tiles:
+    @staticmethod
+    def google_satellites() -> Dict[str, Any]:
+        return {
+            "below": 'traces',
+            "sourcetype": "raster",
+            "sourceattribution": "©Google Maps",
+            "source": [
+                "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+            ]
+        }
+    
+    @staticmethod
+    def chiriin_aerial_imagery() -> Dict[str, Any]:
+        return {
+            "below": 'traces',
+            "sourcetype": "raster",
+            "sourceattribution": "©国土地理院",
+            "source": [
+                "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
+            ]
+        }
+    
+    @staticmethod
+    def chiriin_base_map() -> Dict[str, Any]:
+        return {
+            "below": 'traces',
+            "sourcetype": "raster",
+            "sourceattribution": "©国土地理院",
+            "source": [
+                "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png"
+            ]
+        }
+
+
+
+
 mag_csv_file = r'apps/settings/mag.csv'
 
 

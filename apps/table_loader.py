@@ -166,8 +166,9 @@ def show_editing_table(df, sidebar_resps: SideBarResponse):
     
     # チェックが入っている行を削除
     drop_idx = []
-    for row in grid_response.selected_rows:
-        drop_idx.append(row.get(drg_confs.pt_datetime_col_jn))
+    if grid_response.selected_rows is not None:
+        for _, row in grid_response.selected_rows.iterrows():
+            drop_idx.append(row.get(drg_confs.pt_datetime_col_jn))
     _df = df_res.loc[~df_res.index.isin(drop_idx)].copy()
     
     # DataFrameのハイライト（規定を満たさないセルを強調する）

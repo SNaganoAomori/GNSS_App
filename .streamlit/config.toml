@@ -1,0 +1,11 @@
+[theme]
+primaryColor="#008899"
+backgroundColor="#fbfaf5"
+secondaryBackgroundColor="#dcdddd"
+textColor="#000000"
+
+[global]
+developmentMode = false
+
+[server]
+port = 8501
