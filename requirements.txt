@@ -15,7 +15,6 @@ nbformat==5.10.4
 nest-asyncio==1.6.0
 numpy==1.26.4
 openpyxl==3.1.5
-openssl==3.4.0==h2466b09_0
 packaging==24.2
 pandas==2.1.4
 parso==0.8.4
