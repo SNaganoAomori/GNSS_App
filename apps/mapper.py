@@ -21,49 +21,6 @@ from apps.settings.configs import rename_en_to_jn_in_df
 from apps.settings.configs import Tiles
 
 
-class Tiles:
-    @staticmethod
-    def google_satellites():
-        return dict(
-            url='https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-            name='衛星画像（Google）',
-            fmt='image/png',
-            layers='Satellite',
-            attr=u'Google',
-        )
-    
-    @staticmethod
-    def chiriin_aerial_imagery():
-        return dict(
-            url='https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
-            name='航空写真（国土地理院）',
-            fmt='image/jpeg',
-            layers='Satellite',
-            attr=u'国土地理院',
-        )
-    
-    @staticmethod
-    def chiriin_base_map():
-        return dict(
-            url='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-            name='標準地図（国土地理院）',
-            fmt='image/png',
-            layers='Map',
-            attr=u'国土地理院',
-        )
-    
-    @staticmethod
-    def esri_world_imagery():
-        return dict(
-            url='https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/WMTS/tile/1.0.0/World_Imagery/default/default028mm/{z}/{y}/{x}.jpg',
-            name='衛星画像（Esri）',
-            fmt='image/jpeg',
-            layers='Satellite',
-            attr=u'Esri',
-        )
-
-
-
 class Mapping(object):
     def cmap(self, plot_num: int) -> str:
         """使用するRGBの文字列を取得"""
@@ -336,7 +293,7 @@ def write_html(feature: Dict[str, Any]) -> str:
     """
     return html_style + table
 
-def create_map(df: pl.DataFrame, closed: bool=True):
+def create_map(df: pl.DataFrame, tile: dict, closed: bool=True):
     confs = JnDataCols()
     mapper = Mapping()
     df = df.to_pandas()
@@ -354,52 +311,33 @@ def create_map(df: pl.DataFrame, closed: bool=True):
         min_zoom=5,
         tiles="OpenStreetMap"
     )
-    # 標準地図の追加
+    # タイルの追加
     folium.WmsTileLayer(
         transparent=True,
         overlay=False,
         control=True,
         maxNativeZoom=18,  # Set the maximum native zoom level
         maxZoom=25, # Set the maximum zoom level
-        **Tiles.chiriin_base_map()
+        **tile
     ).add_to(m)
-    # Googleの衛星画像を追加
-    folium.WmsTileLayer(
-        transparent=True,
-        overlay=False,
-        control=True,
-        maxNativeZoom=18,  # Set the maximum native zoom level
-        maxZoom=25, # Set the maximum zoom level
-        **Tiles.google_satellites()
-    ).add_to(m)
-    # Esri World Imageryの追加
-    folium.WmsTileLayer(
-        overlay=False,
-        control=True,
-        maxNativeZoom=18,  # Set the maximum native zoom level
-        maxZoom=25, # Set the maximum zoom level
-        **Tiles.esri_world_imagery()
-    ).add_to(m)
-    # 国土地理院の航空写真を追加
-    folium.WmsTileLayer(
-        transparent=True,
-        overlay=False,
-        control=True,
-        maxNativeZoom=18,  # Set the maximum native zoom level
-        maxZoom=25, # Set the maximum zoom level
-        **Tiles.chiriin_aerial_imagery()
-    ).add_to(m)
-    
+
     icon_circle = BeautifyIcon(
         icon="plane", border_color="#b3334f", text_color="#b3334f", icon_shape="triangle"
     )
     poly_cds = [[geom.y, geom.x] for geom in gdf['geometry']]
-    poly_cds += [poly_cds[0]]
-    folium.Polygon(
-        locations=poly_cds,
-        color="red",
-        weight=3,
-    ).add_to(m)
+    if closed:
+        poly_cds += [poly_cds[0]]
+        folium.Polygon(
+            locations=poly_cds,
+            color="red",
+            weight=3,
+        ).add_to(m)
+    else:
+        folium.PolyLine(
+            locations=poly_cds,
+            color="red",
+            weight=3,
+        ).add_to(m)
 
     # 測点をマップに追加
     labels = mapper.create_display_label(gdf[confs.pt_name_col].to_list())
@@ -431,7 +369,7 @@ def create_map(df: pl.DataFrame, closed: bool=True):
                 html=f'<div style="white-space: nowrap; font-size: 12px; color: black; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;">{label}</div>'
             )
         ).add_to(m)
-
+    
     folium.LayerControl().add_to(m)
     return m
 
@@ -453,12 +391,18 @@ def mapping_in_streamlit(
     # Mapping
     container = st.container()
     map_list = [
-        'ノーマル',
-        '地図に投影',
+        
     ]
+    map_list = {
+        'ノーマル': None,
+        '標準地図に投影（国土地理院）': Tiles.chiriin_base_map(),
+        '空中写真に投影（国土地理院）': Tiles.chiriin_aerial_imagery(),
+        '衛星画像に投影（Google）': Tiles.google_satellites(),
+        '衛星画像に投影（Esri）': Tiles.esri_world_imagery(),
+    }
     radio = container.radio('表示するデータ', map_list, horizontal=True)
     closed = sidebar_resps_list[0].poly_close
-    if radio == map_list[0]:
+    if radio == 'ノーマル':
         # ノーマルのMapping
         if len(sidebar_resps_list) == 1:
             # データが1つの場合のMapping.
@@ -471,7 +415,8 @@ def mapping_in_streamlit(
             st.plotly_chart(fig, config=mapping.plotly_item_confs)
     else:
         # 地図上に投影
-        m = create_map(df, closed)
+        tile = map_list[radio]
+        m = create_map(df, tile, closed)
         st_data = st_folium(m, width=1300)
             
     time_series = st.toggle('時系列で表示')

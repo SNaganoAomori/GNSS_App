@@ -587,38 +587,44 @@ def check_lang_jn_in_df(df: [pl.DataFrame | pd.DataFrame]) -> bool:
 
 class Tiles:
     @staticmethod
-    def google_satellites() -> Dict[str, Any]:
-        return {
-            "below": 'traces',
-            "sourcetype": "raster",
-            "sourceattribution": "©Google Maps",
-            "source": [
-                "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
-            ]
-        }
+    def google_satellites():
+        return dict(
+            url='https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+            name='衛星画像（Google）',
+            fmt='image/png',
+            layers='Satellite',
+            attr=u'Google',
+        )
     
     @staticmethod
-    def chiriin_aerial_imagery() -> Dict[str, Any]:
-        return {
-            "below": 'traces',
-            "sourcetype": "raster",
-            "sourceattribution": "©国土地理院",
-            "source": [
-                "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
-            ]
-        }
+    def chiriin_aerial_imagery():
+        return dict(
+            url='https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
+            name='航空写真（国土地理院）',
+            fmt='image/jpeg',
+            layers='Satellite',
+            attr=u'国土地理院',
+        )
     
     @staticmethod
-    def chiriin_base_map() -> Dict[str, Any]:
-        return {
-            "below": 'traces',
-            "sourcetype": "raster",
-            "sourceattribution": "©国土地理院",
-            "source": [
-                "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png"
-            ]
-        }
-
+    def chiriin_base_map():
+        return dict(
+            url='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+            name='標準地図（国土地理院）',
+            fmt='image/png',
+            layers='Map',
+            attr=u'国土地理院',
+        )
+    
+    @staticmethod
+    def esri_world_imagery():
+        return dict(
+            url='https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/WMTS/tile/1.0.0/World_Imagery/default/default028mm/{z}/{y}/{x}.jpg',
+            name='衛星画像（Esri）',
+            fmt='image/jpeg',
+            layers='Satellite',
+            attr=u'Esri',
+        )
 
 
 
