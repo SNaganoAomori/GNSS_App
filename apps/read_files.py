@@ -41,7 +41,7 @@ def convert_datetimestr2datetime(sentence: str):
 class GPX2(object):
     def __init__(self, fp: str):
         super().__init__()
-        self.trees = [tree for tree in ET.parse(fp).getroot()]
+        self.trees = [tree for tree in ET.parse(fp).getroot() if tree.tag.find('wpt') != -1]
       
     def __loop(self, tree):
         results = []
